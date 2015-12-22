@@ -223,23 +223,19 @@
                                                    }
                                                }
                                                
-                                               NSString *message = [NSString stringWithFormat:@"%@ %@",
-                                                                    itemName,
-                                                                    @"will also be removed from all your devices."];
                                                
+                                               // delete confirmation controller
                                                UIAlertController *alertController = [UIAlertController
                                                                                      alertControllerWithTitle:nil
-                                                                                     message:message
+                                                                                     message:[NSString stringWithFormat:@"%@ %@", itemName, @"will also be removed from all your devices."]
                                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
                                                
                                                UIAlertAction *cancelButton = [UIAlertAction actionWithTitle:@"Cancel"
                                                                                                       style:UIAlertActionStyleCancel
                                                                                                     handler:^(UIAlertAction * action) {
-                                                                                                        
-                                                                                                        [self.tableView setEditing:NO
-                                                                                                                          animated:YES];
-                                                                                                        
+                                                                                                        [self.tableView setEditing:NO animated:YES];
                                                                                                     }];
+                                               
                                                UIAlertAction *deleteButton = [UIAlertAction
                                                                               actionWithTitle:@"Delete from Music Library"
                                                                               style:UIAlertActionStyleDestructive
@@ -247,24 +243,31 @@
                                                                                   
                                                                                   MusicContextualLibraryUpdateAlertAction *deleteAction;
                                                                                   
-                                                                                  [%c(MusicContextualLibraryUpdateAlertAction)
-                                                                                   getContextualLibraryAddRemoveAction:&deleteAction
-                                                                                   keepLocalAction:nil
-                                                                                   forEntityValueContext:valueContext
-                                                                                   overrideItemEntityProvider:nil
-                                                                                   shouldDismissHandler:nil
-                                                                                   additionalPresentationHandler:nil
-                                                                                   didDismissHandler:nil];
+                                                                                  [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:&deleteAction
+                                                                                                                                                   keepLocalAction:nil
+                                                                                                                                             forEntityValueContext:valueContext
+                                                                                                                                        overrideItemEntityProvider:nil
+                                                                                                                                              shouldDismissHandler:nil
+                                                                                                                                     additionalPresentationHandler:nil
+                                                                                                                                                 didDismissHandler:nil];
                                                                                   
                                                                                   [deleteAction performContextualAction];
                                                                                   
                                                                               }];
                                                
-                                               //Step 3: Add the UIAlertAction ok that we just created to our AlertController
+                                               // add actions
                                                [alertController addAction:cancelButton];
                                                [alertController addAction:deleteButton];
                                                
-                                               //Step 4: Present the alert to alertController user
+                                               if ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)) { // iPad requires popover
+                                                   
+                                                   UIPopoverPresentationController *popPresenter = [alertController popoverPresentationController];
+                                                   popPresenter.sourceView = cell;
+                                                   popPresenter.sourceRect = cell.bounds;
+                                                   
+                                               }
+                                               
+                                               //present delete confirmation controller
                                                [self presentViewController:alertController animated:YES completion:nil];
                                                
                                            }];
