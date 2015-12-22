@@ -1,0 +1,79 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		2EBB75811BE97C5A00A3A82D /* layout */ = {isa = PBXFileReference; lastKnownFileType = folder; path = layout; sourceTree = "<group>"; };
+		2EBB75821BE97C5A00A3A82D /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		2EBB758B1BE97C5A00A3A82D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryBrowseTableViewController.xm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2EBB756F1BE97BB900A3A82D = {
+			isa = PBXGroup;
+			children = (
+				2EBB75811BE97C5A00A3A82D /* layout */,
+				2EBB758B1BE97C5A00A3A82D /* Makefile */,
+				2EBB75821BE97C5A00A3A82D /* public */,
+				2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		2EBB75701BE97BB900A3A82D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+			};
+			buildConfigurationList = 2EBB75731BE97BB900A3A82D /* Build configuration list for PBXProject "Cello" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 2EBB756F1BE97BB900A3A82D;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		2EBB75741BE97BB900A3A82D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+			};
+			name = Debug;
+		};
+		2EBB75751BE97BB900A3A82D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2EBB75731BE97BB900A3A82D /* Build configuration list for PBXProject "Cello" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EBB75741BE97BB900A3A82D /* Debug */,
+				2EBB75751BE97BB900A3A82D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2EBB75701BE97BB900A3A82D /* Project object */;
+}

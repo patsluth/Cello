@@ -1,0 +1,9 @@
+Package: com.patsluth.cello
+Name: TinderTunes
+Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw
+Architecture: iphoneos-arm
+Description: Quick contextual options on media cells in the Music App.
+Maintainer: Pat Sluth
+Author: Pat Sluth
+Section: Tweaks
+Icon: 
