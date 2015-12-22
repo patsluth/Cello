@@ -7,20 +7,10 @@
 //
 
 #import "MusicContextualUpNextAlertAction.h"
-#import "MusicLibraryActionDeleteOperation.h"
+#import "MusicContextualLibraryUpdateAlertAction.h"
 #import "MusicEntityValueContext.h"
 
 #import <MediaPlayer/MediaPlayer.h>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -39,10 +29,11 @@
 }
 
 @property (nonatomic,retain) id<MusicEntityValueProviding> baseEntityValueProvider;
+
 - (NSDictionary *)_cachedPropertyValues;
+- (id)valueForEntityProperty:(NSString *)arg1;
 
 @end
-
 
 
 
@@ -116,33 +107,39 @@
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    MusicEntityValueContext *valueContext = [self _entityValueContextAtIndexPath:indexPath];
-    
-    valueContext.wantsItemEntityValueProvider = YES;
-    [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
-    
-    
-    id entityProvider = valueContext.entityValueProvider;
-    
-    if (entityProvider && [[entityProvider class] isSubclassOfClass:%c(MPMediaEntity)]){ // media cell
+    MusicLibraryBrowseTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    if ([(id)cell.entityValueProvider isKindOfClass:%c(MusicCoalescingEntityValueProvider)]) {
         
-        return UITableViewCellEditingStyleDelete;
+        // contains cached media properties
+        MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
+        coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
         
-    } else { // not a media cell
-        
-        return UITableViewCellEditingStyleNone;
-        
+        if ([[(id)coalescingEntityValueProvider.baseEntityValueProvider class] isSubclassOfClass:%c(MPMediaEntity)]){ // media cell
+            
+            return UITableViewCellEditingStyleDelete;
+            
+        }
     }
+    
+    
+    // not a media cell
+    return UITableViewCellEditingStyleNone;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return YES;
+    return NO;
 }
 
 %new
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // contains cached media properties
+    MusicLibraryBrowseTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
+    coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
+    
+    
     /**
      *  Perform Up Next
      *
@@ -176,7 +173,7 @@
     
     UITableViewRowAction *addToUpNextButton = [UITableViewRowAction
                                           rowActionWithStyle:UITableViewRowActionStyleNormal
-                                          title:@"Add to\nUp Next"
+                                          title:@"Up\nNext"
                                           handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
                                               
                                               _upNextAction(indexPath, 0);
@@ -200,7 +197,6 @@
                                            title:@"Delete"
                                            handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
                                                
-                                               
                                                MusicEntityValueContext *valueContext = [self _entityValueContextAtIndexPath:indexPath];
                                                
                                                // make sure our identifiers are set up correctly
@@ -214,38 +210,22 @@
                                                [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
                                                
                                                
-                                               id entityProvider = valueContext.entityValueProvider;
-                                               if (!entityProvider || ![[entityProvider class] isSubclassOfClass:%c(MPMediaEntity)]){ // not a media cell
-                                                   return;
-                                               }
-                                               
-                                               
-                                               
-                                               MusicLibraryBrowseTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-                                               if (![(id)cell.entityValueProvider isKindOfClass:%c(MusicCoalescingEntityValueProvider)]) {
-                                                   return;
-                                               }
-                                               
-                                               
-                                               MusicCoalescingEntityValueProvider *coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
-                                               
-                                               
                                                NSString *itemName; // try and find the best cached name for current item
-                                               NSDictionary *cachedPropertyValues = [coalescingEntityValueProvider _cachedPropertyValues];
-                                               for (NSString *propertyKey in cachedPropertyValues) {
-                                                   if ([propertyKey.lowercaseString isEqualToString:@"name"]) {
-                                                       itemName = [cachedPropertyValues valueForKey:propertyKey];
-                                                       break;
-                                                   } else if ([propertyKey.lowercaseString containsString:@"name"] ||
+                                               for (NSString *propertyKey in [coalescingEntityValueProvider _cachedPropertyValues]) {
+                                                   if ([propertyKey.lowercaseString containsString:@"name"] ||
                                                        [propertyKey.lowercaseString containsString:@"title"]) {
-                                                       itemName = [cachedPropertyValues valueForKey:propertyKey];
+                                                       itemName = [coalescingEntityValueProvider valueForEntityProperty:propertyKey];
+                                                       
+                                                       if ([propertyKey.lowercaseString isEqualToString:@"name"]) {
+                                                           break;
+                                                       }
+                                                       
                                                    }
                                                }
                                                
-                                               NSString *message = [NSString stringWithFormat:@"%@\n%@\n%@",
+                                               NSString *message = [NSString stringWithFormat:@"%@ %@",
                                                                     itemName,
-                                                                    @"Will be removed from all of your devices",
-                                                                    @"This cannot be undone"];
+                                                                    @"will also be removed from all your devices."];
                                                
                                                UIAlertController *alertController = [UIAlertController
                                                                                      alertControllerWithTitle:nil
@@ -256,7 +236,8 @@
                                                                                                       style:UIAlertActionStyleCancel
                                                                                                     handler:^(UIAlertAction * action) {
                                                                                                         
-                                                                                                        [self.tableView setEditing:NO animated:YES];
+                                                                                                        [self.tableView setEditing:NO
+                                                                                                                          animated:YES];
                                                                                                         
                                                                                                     }];
                                                UIAlertAction *deleteButton = [UIAlertAction
@@ -264,23 +245,18 @@
                                                                               style:UIAlertActionStyleDestructive
                                                                               handler:^(UIAlertAction * action) {
                                                                                   
+                                                                                  MusicContextualLibraryUpdateAlertAction *deleteAction;
                                                                                   
-                                                                                  // the identifierCollection will either be an item or a collection
-                                                                                  id identifierCollection = [valueContext itemIdentifierCollection];
-                                                                                  if (!identifierCollection) {
-                                                                                      identifierCollection = [valueContext containerIdentifierCollection];
-                                                                                  }
+                                                                                  [%c(MusicContextualLibraryUpdateAlertAction)
+                                                                                   getContextualLibraryAddRemoveAction:&deleteAction
+                                                                                   keepLocalAction:nil
+                                                                                   forEntityValueContext:valueContext
+                                                                                   overrideItemEntityProvider:nil
+                                                                                   shouldDismissHandler:nil
+                                                                                   additionalPresentationHandler:nil
+                                                                                   didDismissHandler:nil];
                                                                                   
-                                                                                  if (identifierCollection && %c(MusicLibraryActionDeleteOperation)) { // error gettting item
-                                                                                      
-                                                                                      MusicLibraryActionDeleteOperation *deleteOperation = [[%c(MusicLibraryActionDeleteOperation)
-                                                                                                                                             alloc]
-                                                                                                                                            initWithContentItemIdentifierCollection:
-                                                                                                                                            identifierCollection];
-                                                                                      [deleteOperation main];
-                                                                                      
-                                                                                  }
-                                                                                  
+                                                                                  [deleteAction performContextualAction];
                                                                                   
                                                                               }];
                                                
@@ -291,41 +267,79 @@
                                                //Step 4: Present the alert to alertController user
                                                [self presentViewController:alertController animated:YES completion:nil];
                                                
-                                           
                                            }];
     
     
-    playNextButton.backgroundColor = self.view.tintColor;
+    NSNumber *keepLocal = [coalescingEntityValueProvider valueForEntityProperty:@"keepLocal"];
     
-    CGFloat r1, g1, b1, a1, r2, g2, b2, a2;
-    CGFloat tolerance = 0.3;
-    [deleteButton.backgroundColor getRed:&r1 green:&g1 blue:&b1 alpha:&a1];
-    [playNextButton.backgroundColor getRed:&r2 green:&g2 blue:&b2 alpha:&a2];
+    UITableViewRowAction *downloadButton = [UITableViewRowAction
+                                          rowActionWithStyle:UITableViewRowActionStyleNormal
+                                            title:(keepLocal.boolValue ? @"Remove\nDownload" : @"Download")
+                                          handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+                                              
+                                              MusicEntityValueContext *valueContext = [self _entityValueContextAtIndexPath:indexPath];
+                                              
+                                              // make sure our identifiers are set up correctly
+                                              valueContext.wantsItemGlobalIndex = YES;
+                                              valueContext.wantsItemEntityValueProvider = YES;
+                                              valueContext.wantsContainerEntityValueProvider = YES;
+                                              valueContext.wantsItemIdentifierCollection = YES;
+                                              valueContext.wantsContainerIdentifierCollection = YES;
+                                              valueContext.wantsItemPlaybackContext = YES;
+                                              valueContext.wantsContainerPlaybackContext = YES;
+                                              [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
+                                              
+                                              
+                                              MusicContextualLibraryUpdateAlertAction *downloadAction;
+                                              
+                                              [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:nil
+                                                                                                               keepLocalAction:&downloadAction
+                                                                                                         forEntityValueContext:valueContext
+                                                                                                    overrideItemEntityProvider:nil
+                                                                                                          shouldDismissHandler:nil
+                                                                                                 additionalPresentationHandler:nil
+                                                                                                             didDismissHandler:nil];
+                                              [downloadAction performContextualAction];
+                                              [self.tableView setEditing:NO animated:YES];
+                                              
+                                              
+                                          }];
     
-    if (fabs(r1 - r2) <= tolerance &&
-        fabs(g1 - g2) <= tolerance &&
-        fabs(b1 - b2) <= tolerance &&
-        fabs(a1 - a2) <= tolerance) { // Colors are to similar
-        
-        addToUpNextButton.backgroundColor = [UIColor darkGrayColor];
-        
-    } else {
-        
-        //calculate midpoint of the 2 colours
-        CGFloat r = (r1 + r2)/2.0;
-        r = fmax(r, tolerance);
-        CGFloat g = (g1 + g2)/2.0;
-        g = fmax(g, tolerance);
-        CGFloat b = (b1 + b2)/2.0;
-        b = fmax(b, tolerance);
-        CGFloat a = (a1 + a2)/2.0;
-        a = fmax(a, tolerance);
-        
-        addToUpNextButton.backgroundColor = [UIColor colorWithRed:r green:g blue:b alpha:a];
-        
-    }
     
-    return @[deleteButton, addToUpNextButton, playNextButton];
+    
+    playNextButton.backgroundColor = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
+    addToUpNextButton.backgroundColor = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
+    downloadButton.backgroundColor = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
+    
+//    CGFloat r1, g1, b1, a1, r2, g2, b2, a2;
+//    CGFloat tolerance = 0.3;
+//    [deleteButton.backgroundColor getRed:&r1 green:&g1 blue:&b1 alpha:&a1];
+//    [playNextButton.backgroundColor getRed:&r2 green:&g2 blue:&b2 alpha:&a2];
+//    
+//    if (fabs(r1 - r2) <= tolerance &&
+//        fabs(g1 - g2) <= tolerance &&
+//        fabs(b1 - b2) <= tolerance &&
+//        fabs(a1 - a2) <= tolerance) { // Colors are to similar
+//        
+//        addToUpNextButton.backgroundColor = [UIColor darkGrayColor];
+//        
+//    } else {
+//        
+//        //calculate midpoint of the 2 colours
+//        CGFloat r = (r1 + r2)/2.0;
+//        r = fmax(r, tolerance);
+//        CGFloat g = (g1 + g2)/2.0;
+//        g = fmax(g, tolerance);
+//        CGFloat b = (b1 + b2)/2.0;
+//        b = fmax(b, tolerance);
+//        CGFloat a = (a1 + a2)/2.0;
+//        a = fmax(a, tolerance);
+//        
+//        addToUpNextButton.backgroundColor = [UIColor colorWithRed:r green:g blue:b alpha:a];
+//        
+//    }
+    
+    return @[playNextButton, addToUpNextButton, downloadButton, deleteButton];
 }
 
 %end
