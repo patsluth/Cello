@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		2E7C5E391C2B23A000AAC247 /* MusicContextualActionsHeaderViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicContextualActionsHeaderViewController.xm; sourceTree = "<group>"; };
+		2E7C5E3A1C2B2C4100AAC247 /* MusicCoalescingEntityValueProvider.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicCoalescingEntityValueProvider.xm; sourceTree = "<group>"; };
 		2EBB75811BE97C5A00A3A82D /* layout */ = {isa = PBXFileReference; lastKnownFileType = folder; path = layout; sourceTree = "<group>"; };
 		2EBB75821BE97C5A00A3A82D /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		2EBB758B1BE97C5A00A3A82D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -18,8 +20,10 @@
 			isa = PBXGroup;
 			children = (
 				2EBB75811BE97C5A00A3A82D /* layout */,
-				2EBB758B1BE97C5A00A3A82D /* Makefile */,
 				2EBB75821BE97C5A00A3A82D /* public */,
+				2EBB758B1BE97C5A00A3A82D /* Makefile */,
+				2E7C5E3A1C2B2C4100AAC247 /* MusicCoalescingEntityValueProvider.xm */,
+				2E7C5E391C2B23A000AAC247 /* MusicContextualActionsHeaderViewController.xm */,
 				2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */,
 			);
 			sourceTree = "<group>";

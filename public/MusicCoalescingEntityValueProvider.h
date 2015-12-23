@@ -16,6 +16,9 @@
 - (NSDictionary *)_cachedPropertyValues;
 - (id)valueForEntityProperty:(NSString *)arg1;
 
+// new
+- (NSString *)cello_EntityNameBestGuess;
+
 @end
 
 
