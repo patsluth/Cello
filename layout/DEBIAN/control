@@ -2,7 +2,7 @@ Package: com.patsluth.cello
 Name: Cello
 Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw
 Architecture: iphoneos-arm
-Description: Quick contextual options on media cells in the Music App.
+Description: Slide music app cells to access contextual options. Supported actions include Delete, Download, Remove Download, Play Next, and Add to Up Next.
 Maintainer: Pat Sluth
 Author: Pat Sluth
 Section: Tweaks

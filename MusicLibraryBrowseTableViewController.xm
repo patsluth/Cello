@@ -6,52 +6,18 @@
 //  Copyright (c) 2015 Pat Sluth. All rights reserved.
 //
 
+#import "MusicCoalescingEntityValueProvider.h"
 #import "MusicContextualUpNextAlertAction.h"
 #import "MusicContextualLibraryUpdateAlertAction.h"
 #import "MusicEntityValueContext.h"
 
-#import <MediaPlayer/MediaPlayer.h>
+#import "testVCViewController.h"
 
 
 
 
 
-@interface MPConcreteMediaEntityPropertiesCache : NSObject
-{
-    //NSMutableDictionary *_properties;
-}
-
-@end
-
-@interface MusicCoalescingEntityValueProvider : NSObject
-{
-    //NSMutableDictionary *_properties;
-}
-
-@property (nonatomic,retain) id<MusicEntityValueProviding> baseEntityValueProvider;
-
-- (NSDictionary *)_cachedPropertyValues;
-- (id)valueForEntityProperty:(NSString *)arg1;
-
-@end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@interface MusicLibraryBrowseTableViewController : UIViewController
+@interface MusicLibraryBrowseTableViewController : UITableViewController <UIViewControllerPreviewingDelegate>
 {
 }
 
@@ -94,7 +60,191 @@
 
 
 
+
+
+
+
+
+
+
+
+
+@interface MusicContextualActionsHeaderViewController : UIViewController
+{
+    //MusicContextualActionsHeaderLockupView* _lockupView;
+}
+
+@property (nonatomic, readonly) MusicEntityValueContext *entityValueContext;
+
+-(id)initWithEntityValueContext:(id)arg1 contextualActions:(id)arg2 ;
+-(void)contextualActionsHeaderLockupViewWasSelected:(id)arg1 ;
+-(id)selectionHandler;
+
+@end
+
+%hook MusicContextualActionsHeaderViewController
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems
+{
+    // setup a list of preview actions
+    UIPreviewAction *addToUpNextButton = [UIPreviewAction
+                                          actionWithTitle:@"Add to Up Next"
+                                          style:UIPreviewActionStyleDefault
+                                          handler:^(UIPreviewAction * _Nonnull action,
+                                                    UIViewController * _Nonnull previewViewController) {
+                                              
+                                              MusicContextualActionsHeaderViewController *vc = (MusicContextualActionsHeaderViewController *)previewViewController;
+                                              
+                                              MusicContextualUpNextAlertAction *alertAction;
+                                              alertAction = [%c(MusicContextualUpNextAlertAction)
+                                                             contextualUpNextActionWithEntityValueContext:vc.entityValueContext
+                                                             insertionType:0
+                                                             didDismissHandler:nil];
+                                              
+                                              [alertAction performContextualAction];
+                                              
+    }];
+    
+    UIPreviewAction *playNextButton = [UIPreviewAction
+                                       actionWithTitle:@"Play Next"
+                                       style:UIPreviewActionStyleDefault
+                                       handler:^(UIPreviewAction * _Nonnull action,
+                                                 UIViewController * _Nonnull previewViewController) {
+                                                                   
+                                           MusicContextualActionsHeaderViewController *vc = (MusicContextualActionsHeaderViewController *)previewViewController;
+                                           
+                                           MusicContextualUpNextAlertAction *alertAction;
+                                           alertAction = [%c(MusicContextualUpNextAlertAction)
+                                                          contextualUpNextActionWithEntityValueContext:vc.entityValueContext
+                                                          insertionType:1
+                                                          didDismissHandler:nil];
+                                           
+                                           [alertAction performContextualAction];
+        
+    }];
+    
+    UIPreviewAction *deleteAction = [UIPreviewAction actionWithTitle:@"Delete" style:UIPreviewActionStyleDestructive
+                                                             handler:^(UIPreviewAction * _Nonnull action,
+                                                                       UIViewController * _Nonnull previewViewController) {
+        
+        
+    }];
+    
+    UIPreviewAction *downloadAction = [UIPreviewAction actionWithTitle:@"Download"
+                                                                 style:UIPreviewActionStyleDefault
+                                                               handler:^(UIPreviewAction * _Nonnull action,
+                                                                         UIViewController * _Nonnull previewViewController) {
+        
+    }];
+    
+    return @[addToUpNextButton, playNextButton, downloadAction, deleteAction];
+}
+
+%end
+
+
+
+
+
+
+
+
+
+
+
+
+
 %hook MusicLibraryBrowseTableViewController
+
+- (void)viewDidLoad
+{
+    %orig();
+    
+    // check device for 3D touch capability
+    if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] &&
+        self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+        
+       // [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        
+    }
+}
+
+
+// peek
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
+{
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
+    MusicLibraryBrowseTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    
+    if (cell) {
+        previewingContext.sourceRect = cell.frame;
+        
+        
+        
+        
+ 
+        
+//        testVCViewController *controller = [[testVCViewController alloc] init];
+//        controller.preferredContentSize = cell.frame.size;
+//        controller.title = [NSString stringWithFormat:@"%@", cell];
+//        controller.view = cell;
+        //controller.view.backgroundColor = [UIColor redColor];
+        
+        
+        
+        
+        
+        
+        MusicEntityValueContext *valueContext = [self _entityValueContextAtIndexPath:indexPath];
+        
+        // make sure our queries are set up correctly
+        valueContext.wantsItemGlobalIndex = YES;
+        valueContext.wantsItemEntityValueProvider = YES;
+        valueContext.wantsContainerEntityValueProvider = YES;
+        valueContext.wantsItemIdentifierCollection = YES;
+        valueContext.wantsContainerIdentifierCollection = YES;
+        valueContext.wantsItemPlaybackContext = YES;
+        valueContext.wantsContainerPlaybackContext = YES;
+        [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
+        
+        
+        
+        
+        MusicContextualActionsHeaderViewController *controller = [[%c(MusicContextualActionsHeaderViewController) alloc]
+                                                                  initWithEntityValueContext:valueContext
+                                                                  contextualActions:nil];
+        controller.view.backgroundColor = [UIColor whiteColor];
+        
+        
+        
+        return controller;
+        
+        
+        
+    }
+    
+    return nil;
+}
+
+// //pop
+//- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
+//{
+////    dispatch_async(dispatch_get_main_queue(), ^ {
+////        [self showDetailViewController:viewControllerToCommit sender:self];
+////    });
+//    
+//    MusicContextualActionsHeaderViewController *controller = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
+//    
+//    //id x = MSHookIvar<id>(controller, "_lockupView");
+//    [controller contextualActionsHeaderLockupViewWasSelected:nil];
+//
+//    
+//}
+
+
+
+
+
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -160,12 +310,12 @@
         [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
         
         
-        MusicContextualUpNextAlertAction *a = [%c(MusicContextualUpNextAlertAction)
+        MusicContextualUpNextAlertAction *alertAction = [%c(MusicContextualUpNextAlertAction)
                                                contextualUpNextActionWithEntityValueContext:valueContext
                                                insertionType:option
                                                didDismissHandler:nil];
         
-        [a performContextualAction];
+        [alertAction performContextualAction];
         
     };
     
