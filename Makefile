@@ -4,7 +4,7 @@
 
 
 FINALPACKAGE = 0
-PACKAGE_VERSION = 1.0-1
+PACKAGE_VERSION = 1.0-2
 
 
 
@@ -19,7 +19,7 @@ TARGET = iphone:clang:latest
 
 TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
-SWCello_FILES = MusicLibraryBrowseTableViewController.xm testVCViewController.m
+SWCello_FILES = MusicLibraryBrowseTableViewController.xm
 SWCello_FRAMEWORKS = Foundation UIKit
 SWCello_LIBRARIES = substrate
 

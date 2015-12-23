@@ -11,8 +11,6 @@
 #import "MusicContextualLibraryUpdateAlertAction.h"
 #import "MusicEntityValueContext.h"
 
-#import "testVCViewController.h"
-
 
 
 
@@ -123,21 +121,41 @@
         
     }];
     
-    UIPreviewAction *deleteAction = [UIPreviewAction actionWithTitle:@"Delete" style:UIPreviewActionStyleDestructive
-                                                             handler:^(UIPreviewAction * _Nonnull action,
-                                                                       UIViewController * _Nonnull previewViewController) {
-        
+    UIPreviewAction *deleteAction = [UIPreviewAction
+                                     actionWithTitle:@"Delete"
+                                     style:UIPreviewActionStyleDestructive
+                                     handler:^(UIPreviewAction * _Nonnull action,
+                                               UIViewController * _Nonnull previewViewController) {
+                                         
+                                         
+                                         MusicContextualActionsHeaderViewController *vc = (MusicContextualActionsHeaderViewController *)previewViewController;
+                                         
+                                         //TODO: CONFIRM!!
+                                         
+                                         MusicContextualLibraryUpdateAlertAction *deleteAction;
+                                         
+                                         [%c(MusicContextualLibraryUpdateAlertAction)
+                                          getContextualLibraryAddRemoveAction:&deleteAction
+                                          keepLocalAction:nil
+                                          forEntityValueContext:vc.entityValueContext
+                                          overrideItemEntityProvider:nil
+                                          shouldDismissHandler:nil
+                                          additionalPresentationHandler:nil
+                                          didDismissHandler:nil];
+                                         
+                                         [deleteAction performContextualAction];
+                                         
         
     }];
     
-    UIPreviewAction *downloadAction = [UIPreviewAction actionWithTitle:@"Download"
-                                                                 style:UIPreviewActionStyleDefault
-                                                               handler:^(UIPreviewAction * _Nonnull action,
-                                                                         UIViewController * _Nonnull previewViewController) {
-        
-    }];
+//    UIPreviewAction *downloadAction = [UIPreviewAction actionWithTitle:@"Download"
+//                                                                 style:UIPreviewActionStyleDefault
+//                                                               handler:^(UIPreviewAction * _Nonnull action,
+//                                                                         UIViewController * _Nonnull previewViewController) {
+//        
+//    }];
     
-    return @[addToUpNextButton, playNextButton, downloadAction, deleteAction];
+    return @[addToUpNextButton, playNextButton, deleteAction];
 }
 
 %end

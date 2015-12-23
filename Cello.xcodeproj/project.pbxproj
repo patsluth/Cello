@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		2E265DF31C2A42A2003EF569 /* testVCViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = testVCViewController.h; sourceTree = "<group>"; };
-		2E265DF41C2A42A2003EF569 /* testVCViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = testVCViewController.m; sourceTree = "<group>"; };
 		2EBB75811BE97C5A00A3A82D /* layout */ = {isa = PBXFileReference; lastKnownFileType = folder; path = layout; sourceTree = "<group>"; };
 		2EBB75821BE97C5A00A3A82D /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		2EBB758B1BE97C5A00A3A82D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -19,8 +17,6 @@
 		2EBB756F1BE97BB900A3A82D = {
 			isa = PBXGroup;
 			children = (
-				2E265DF31C2A42A2003EF569 /* testVCViewController.h */,
-				2E265DF41C2A42A2003EF569 /* testVCViewController.m */,
 				2EBB75811BE97C5A00A3A82D /* layout */,
 				2EBB758B1BE97C5A00A3A82D /* Makefile */,
 				2EBB75821BE97C5A00A3A82D /* public */,
