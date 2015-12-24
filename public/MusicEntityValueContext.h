@@ -1,9 +1,7 @@
 
-@class MPUContentItemIdentifierCollection, MPPlaybackContext;
+#import "MusicEntityProviding.h"
 
-@protocol MusicEntityValueProviding
-    - (id)valueForEntityProperty:(id)arg1;
-@end
+@class MPUContentItemIdentifierCollection, MPPlaybackContext;
 
 
 
