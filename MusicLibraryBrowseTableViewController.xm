@@ -13,6 +13,7 @@
 #import "MusicContextualLibraryUpdateAlertAction.h"
 #import "MusicContextualRemoveFromPlaylistAlertAction.h"
 
+#import "MusicContextualActionsConfiguration.h"
 #import "MusicContextualActionsHeaderViewController.h"
 
 typedef enum {
@@ -24,59 +25,77 @@ typedef enum {
 
 
 
-@interface MusicMediaProductDetailViewController : UIViewController //MusicMediaDetailViewController
-{
+
+
+
+
+
+
+
+
+
+
+
+@interface MusicLibraryViewConfiguration : NSObject {
 }
 
-- (id)initWithContainerEntityProvider:(id)arg1 // MusicMediaEntityProvider
-              tracklistEntityProvider:(id)arg2 // MusicMediaEntityProvider
-                        clientContext:(id)arg3 // MusicClientContext
-existingJSProductNativeViewController:(id)arg4;
+@property (nonatomic,copy) NSString * iconName;
+@property (nonatomic,copy) NSString * identifier;
+@property (nonatomic,copy) NSString * title;
+@property (nonatomic,copy) NSArray * userActivityItemTypes;
+@property (nonatomic,retain) Class viewControllerClass;
+@property (nonatomic,readonly) BOOL wantsVisualIndicationOfSelection;
+@property (assign,nonatomic) BOOL supportsSplitView;
+@property (assign,nonatomic) BOOL wantsImmediateHandlingOfEditingChangeRecords;
+//@property (nonatomic,readonly) MusicEntityViewDescriptor * entityViewDescriptor;
+-(void)setIconName:(NSString *)arg1 ;
+-(NSString *)iconName;
+-(void)setTitle:(NSString *)arg1 ;
+-(NSString *)identifier;
+-(NSString *)title;
+-(id)newViewController;
+-(id)loadEntityViewDescriptor;
 
-- (BOOL)_shouldAutomaticallyPopForMissingContainerEntityValueProvider;
 
+-(long long)handleSelectionOfEntityValueContext:(id)arg1 fromViewController:(id)arg2 ;
+
+
+-(BOOL)canDeleteEntityValueContext:(id)arg1 ;
+-(long long)handleSelectionFromUserActivityContext:(id)arg1 containerItem:(id)arg2 entityValueContext:(id)arg3 viewController:(id)arg4 ;
+-(BOOL)canPreviewEntityValueContext:(id)arg1 ;
+-(id)previewViewControllerForEntityValueContext:(id)arg1 fromViewController:(id)arg2 ;
+-(void)handleCommitPreviewViewController:(id)arg1 fromViewController:(id)arg2 ;
+-(BOOL)canMoveEntityValueContext:(id)arg1 ;
 @end
 
-%hook MusicMediaProductDetailViewController
-
-- (id)initWithContainerEntityProvider:(id)arg1
-tracklistEntityProvider:(id)arg2
-clientContext:(id)arg3
-existingJSProductNativeViewController:(id)arg4
-{
-    NSLog(@"MusicMediaProductDetailViewController init 1 %@\n\n%@\n\n%@\n\n%@\n\n", arg1, arg2, arg3, arg4);
-    return %orig(arg1, arg2, arg3, arg4);
+@interface MusicLibrarySongsViewConfiguration : MusicLibraryViewConfiguration {
 }
 
-%end
+-(long long)handleSelectionOfEntityValueContext:(id)arg1 fromViewController:(id)arg2 ;
+@end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//%hook MusicLibraryViewConfiguration
+//
+//-(BOOL)canPreviewEntityValueContext:(id)arg1
+//{
+//    BOOL x = %orig(arg1);
+//    
+//    NSLog(@"PAT canPreviewEntityValueContext \n%@\n%@\n", @(x), arg1);
+//    
+//    return YES;
+//}
+//
+//-(id)previewViewControllerForEntityValueContext:(id)arg1 fromViewController:(id)arg2
+//{
+//    id x = %orig(arg1, arg2);
+//    
+//    NSLog(@"PAT previewViewControllerForEntityValueContext \n%@\n%@\n%@\n", x, arg1, arg2);
+//    
+//    return x;
+//}
+//
+//%end
 
 
 
@@ -94,18 +113,19 @@ existingJSProductNativeViewController:(id)arg4
 
 
 @protocol Cello_MusicEntityTableViewCellValueProviding
-
 @required
-
 @property (nonatomic,retain) id<MusicEntityValueProviding> entityValueProvider;
-
 @end
+
+
 
 
 
 @interface MusicLibraryBrowseTableViewController : UITableViewController <UIViewControllerPreviewingDelegate>
 {
 }
+
+@property (nonatomic,readonly) MusicLibraryViewConfiguration * libraryViewConfiguration;
 
 @property (strong, nonatomic) /*MusicClientContext*/ id clientContext;
 @property (strong, nonatomic) /*MusicTableView*/ UITableView *tableView;
@@ -121,6 +141,55 @@ existingJSProductNativeViewController:(id)arg4
 - (UIAlertController *)cello_deleteConfirmationAlertController:(NSIndexPath *)indexPath;
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+//@interface MusicMediaProductDetailViewController : UIViewController
+//
+//-(id)initWithContainerEntityProvider:(id)arg1
+//tracklistEntityProvider:(id)arg2
+//clientContext:(id)arg3
+//existingJSProductNativeViewController:(id)arg4;
+//
+//@end;
+//
+////MusicPreviewViewController
+//%hook MusicMediaProductDetailViewController
+//
+//-(id)initWithContainerEntityProvider:(id)arg1
+//tracklistEntityProvider:(id)arg2
+//clientContext:(id)arg3
+//existingJSProductNativeViewController:(id)arg4
+//{
+//    id x = %orig(arg1, arg2, arg3, arg4);
+//    
+//    NSLog(@"PAT initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n", x, arg1, arg2, arg3, arg4);
+//    
+//    return x;
+//}
+//
+//-(BOOL)_shouldAutomaticallyPopForMissingContainerEntityValueProvider
+//{
+//    return YES;
+//}
+//
+//%end
+
+
+
+
+
+
+
+
 
 
 
@@ -154,23 +223,19 @@ existingJSProductNativeViewController:(id)arg4
     if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] &&
         self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
         
-       // [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
         
     }
 }
 
-
-
-
-
-
-
-
-
-
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
+    if (self.presentedViewController){
+        return nil;
+    }
+    
+    
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
     UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
@@ -184,17 +249,13 @@ existingJSProductNativeViewController:(id)arg4
     
     if (cell) {
         
-        previewingContext.sourceRect = cell.frame;
-        
-//        testVCViewController *controller = [[testVCViewController alloc] init];
-//        controller.preferredContentSize = cell.frame.size;
-//        controller.title = [NSString stringWithFormat:@"%@", cell];
-//        controller.view = cell;
-        //controller.view.backgroundColor = [UIColor redColor];
-        
+        //previewingContext.sourceRect = cell.frame;
         MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
         
-
+        //default controller
+       // UIViewController *x = [self.libraryViewConfiguration previewViewControllerForEntityValueContext:valueContext fromViewController:self];
+        
+        
         
         controller = [[%c(MusicContextualActionsHeaderViewController) alloc] initWithEntityValueContext:valueContext
                                                                                       contextualActions:nil];
@@ -254,61 +315,20 @@ existingJSProductNativeViewController:(id)arg4
     return controller;
 }
 
-// //pop
+// pop
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
 {
-    //MusicContextualActionsHeaderViewController *commitVC = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
+    MusicContextualActionsHeaderViewController *controller = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
     
+    // Dirty hack to simulate tapping on the header view
+    MusicContextualActionsConfiguration *tempConfig = [[%c(MusicContextualActionsConfiguration) alloc] init];
     
-    
-    
-    
-    
-    
-    
-//    id x = [self valueForKey:@"_entityViewDescriptor"];
-//    id y = [x valueForKey:@"_entityProvider"];
-//    
-//    NSLog(@"PAT1 %@", x);
-//    NSLog(@"PAT2 %@", y);
-    
-    
-    
-//    MusicMediaProductDetailViewController *testVC;
-//    testVC = [[%c(MusicMediaProductDetailViewController) alloc] initWithContainerEntityProvider:y
-//              tracklistEntityProvider:y
-//              clientContext:self.clientContext
-//              existingJSProductNativeViewController:nil];
-//    
-//    
-//    NSLog(@"PAT3 %@", testVC);
-//    [self showDetailViewController:testVC sender:self];
-    
-    
-    
-    
-    
-    
-    
-    
-//    dispatch_async(dispatch_get_main_queue(), ^ {
-//        [self showDetailViewController:viewControllerToCommit sender:self];
-//    });
-    
-//    MusicContextualActionsHeaderViewController *controller = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
-//    
-//    //id x = MSHookIvar<id>(controller, "_lockupView");
-//    [controller contextualActionsHeaderLockupViewWasSelected:nil];
-
-    
+    // Set up a new MusicActionAlertController and select the header
+    tempConfig.entityValueContext = controller.entityValueContext;
+    [tempConfig _didSelectHeaderFromAlertController:[tempConfig newViewController]];
 }
 
-
-
-
 #pragma mark - UITableViewEditing
-
-/*
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -414,8 +434,6 @@ existingJSProductNativeViewController:(id)arg4
     
     return @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
 }
- 
- */
 
 #pragma mark - Cello Additions
 
@@ -540,11 +558,6 @@ existingJSProductNativeViewController:(id)arg4
 }
 
 %end
-
-
-
-
-
 
 
 

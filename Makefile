@@ -19,7 +19,7 @@ TARGET = iphone:clang:latest
 
 TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
-SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicContextualActionsHeaderViewController.xm MusicLibraryBrowseTableViewController.xm
+SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicContextualActionsHeaderViewController.xm MusicLibraryBrowseTableViewController.xm CelloMediaEntityPreviewViewController.m
 SWCello_FRAMEWORKS = Foundation UIKit
 SWCello_LIBRARIES = substrate
 
