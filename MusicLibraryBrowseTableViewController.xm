@@ -48,103 +48,20 @@
 
 
 
-//%hook MusicMediaProfileDetailViewController
-//
-//-(id)initWithContainerEntityProvider:(id)arg1
-//clientContext:(id)arg2
-//existingJSProfileNativeViewController:(id)arg3
-//profileType:(unsigned long long)arg4
-//{
-//    id x = %orig(arg1, arg2, arg3, arg4);
-//    
-//    NSLog(@"PAT MusicMediaProfileDetailViewController:initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n",
-//          x,
-//          arg1,
-//          arg2,
-//          arg3,
-//          @(arg4));
-//    
-//    return x;
-//}
-//
-//%end
-//
-//
-////MusicPreviewViewController
-//%hook MusicMediaProductDetailViewController
-//
-//-(id)initWithContainerEntityProvider:(MusicMediaEntityProvider *)arg1
-//tracklistEntityProvider:(MusicMediaEntityProvider *)arg2
-//clientContext:(id)arg3
-//existingJSProductNativeViewController:(id)arg4
-//{
-//    id x = %orig(arg1, arg2, arg3, arg4);
-//    
-//    NSLog(@"PAT initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n", x, arg1, arg2, arg3, arg4);
-//    
-//    NSLog(@"***\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n***",
-//          arg1.mediaQuery,
-//          arg1.mediaQueryDataSource.entities,
-//          arg2.mediaQuery,
-//          arg2.mediaQueryDataSource.entities);
-//    
-//    return x;
-//}
-//
-//%end
-//
-//
-//%hook MusicMediaEntityProvider
-//
-//- (id)initWithMediaQuery:(id)arg1
-//{
-//    id x = %orig(arg1);
-//    
-//    NSLog(@"PAT MusicMediaEntityProvider:initWithMediaQuery \n\n%@\n\n%@\n\n", x, arg1);
-//    
-//    return x;
-//}
-//
-//%end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 %hook MusicLibraryBrowseTableViewController
 
-
-- (void)viewDidLoad
-{
-    %orig();
-    
-    // check device for 3D touch capability
-    if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] &&
-        self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-        
-        [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
-        
-    }
-}
+//- (void)viewDidLoad
+//{
+//    %orig();
+//    
+//    // check device for 3D touch capability
+//    if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] &&
+//        self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+//        
+//        [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+//        
+//    }
+//}
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -221,113 +138,14 @@
             previewViewController = [self cello_previewViewControllerForEntityValueContext:valueContext];
         }
         
+        
+        // make sure header view is layed out and set our content size to it's height
+        [previewViewController.view layoutSubviews];
+        previewViewController.preferredContentSize = CGSizeMake(0.0, CGRectGetHeight(previewViewController.headerContentViewController.view.bounds));
+        
         previewViewController.celloPreviewActionItems = @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
         
         return previewViewController;
-        
-        
-        
-        
-//        // set up view controller
-//        MPMediaQuery *titleQuery = [MPMediaQuery songsQuery];
-//        MPMediaQuery *albumArtistQuery = [MPMediaQuery artistsQuery];
-//        MPMediaQuery *albumQuery = [MPMediaQuery albumsQuery];
-//        
-////        MPMediaItem *item;
-////        if ([(id)valueContext.entityValueProvider isKindOfClass:[MPMediaItem class]]) {
-////            item = (MPMediaItem *)valueContext.entityValueProvider;
-////        } else {
-////            NSLog(@"NOT MEDIA ITEM");
-////        }
-////        
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyPersistentID]);
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyAlbumPersistentID]);
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyArtistPersistentID]);
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyAlbumArtistPersistentID]);
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyGenrePersistentID]);
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyComposerPersistentID]);
-////        NSLog(@"PAT X %@", [item valueForProperty:MPMediaItemPropertyPodcastPersistentID]);
-//        
-//        
-//        
-//        
-// 
-//        //
-//        //valueContext.entityValueProvider can be
-//        //
-//        //MPConcreteMediaItem
-//        //MPConcreteMediaItemCollection
-//        //MPConcreteMediaPlaylist
-//        //
-//        
-//        
-//        
-//        
-//        MPMediaEntity *ent = (MPMediaEntity *)valueContext.entityValueProvider;
-//        MPMediaItem *item = ent.representativeItem;
-//        
-//        
-//       
-//        
-//        
-//        
-//        
-//        
-//        //SLOW
-//        previewController = [self.libraryViewConfiguration previewViewControllerForEntityValueContext:valueContext fromViewController:nil];
-//        previewController.celloPreviewActionItems = @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
-//        return previewController;
-//        
-//        
-//        
-//        
-//        
-//        
-//        MPMediaPropertyPredicate *albumPIDPredicate = [MPMediaPropertyPredicate predicateWithValue:@(item.albumPersistentID)
-//                                                                                       forProperty:MPMediaItemPropertyAlbumPersistentID];
-//        MPMediaPropertyPredicate *albumArtistPIDPredicate = [MPMediaPropertyPredicate predicateWithValue:@(item.albumArtistPersistentID)
-//                                                                                             forProperty:MPMediaItemPropertyAlbumArtistPersistentID];
-//        
-//        [titleQuery addFilterPredicate:albumPIDPredicate];
-//        [albumQuery addFilterPredicate:albumPIDPredicate];
-//        
-//        
-//        [albumArtistQuery addFilterPredicate:albumArtistPIDPredicate];
-//
-//        
-//        
-//        MusicMediaEntityProvider *titleProvider = [[%c(MusicMediaEntityProvider) alloc] initWithMediaQuery:titleQuery];
-//        MusicMediaEntityProvider *albumArtistProvider = [[%c(MusicMediaEntityProvider) alloc] initWithMediaQuery:albumArtistQuery];
-//        MusicMediaEntityProvider *albumProvider = [[%c(MusicMediaEntityProvider) alloc] initWithMediaQuery:albumQuery];
-//        
-//        
-//        
-//        
-//        
-//        
-//        previewController = [[%c(MusicMediaProfileDetailViewController) alloc] initWithContainerEntityProvider:albumArtistProvider
-//                                                                                                 clientContext:self.clientContext
-//                                                                         existingJSProfileNativeViewController:nil
-//                                                                                                   profileType:0];
-//        previewController.celloPreviewActionItems = @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
-//        return previewController;
-//        
-//        
-//        
-//        
-//        
-//        
-//        
-//        
-//        
-//        
-//        
-//        previewController = [[%c(MusicMediaAlbumDetailViewController) alloc] initWithContainerEntityProvider:albumProvider
-//                                                                              tracklistEntityProvider:titleProvider
-//                                                                                        clientContext:self.clientContext
-//                                                                existingJSProductNativeViewController:nil];
-//
-//        previewController.celloPreviewActionItems = @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
     }
 
     return nil;
@@ -436,12 +254,6 @@
                                               
                                           }];
     
-    
-    
-//    playNextButton.backgroundColor = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
-//    addToUpNextButton.backgroundColor = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
-//    downloadButton.backgroundColor = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
-    
     playNextAction.backgroundColor = [UIColor darkGrayColor];
     addToUpNextAction.backgroundColor = [UIColor grayColor];
     downloadAction.backgroundColor = [UIColor lightGrayColor];
@@ -474,7 +286,7 @@
 }
 
 %new
-- (MusicMediaDetailViewController *)cello_previewViewControllerForEntityValueContext:(MusicEntityValueContext *)entityValueContext
+- (UIViewController *)cello_previewViewControllerForEntityValueContext:(MusicEntityValueContext *)entityValueContext
 {
     id provider = entityValueContext.entityValueProvider;
     MusicMediaDetailViewController *previewViewController = nil;
@@ -505,6 +317,8 @@
         
         
     } else if ([provider isKindOfClass:%c(MPConcreteMediaItemCollection)]) { // artist, album, genre, etc
+        
+        // TODO:
         
     }
     
@@ -615,15 +429,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
 @interface MusicEntityTracklistItemTableViewCell : UITableViewCell <Cello_MusicEntityTableViewCellValueProviding>
 {
 }
@@ -681,6 +486,76 @@
 }
 
 %end
+
+
+
+
+
+
+
+
+
+#pragma mark - Media Query View Controller Mapping DEBUG
+
+//%hook MusicMediaProfileDetailViewController
+//
+//-(id)initWithContainerEntityProvider:(id)arg1
+//clientContext:(id)arg2
+//existingJSProfileNativeViewController:(id)arg3
+//profileType:(unsigned long long)arg4
+//{
+//    id x = %orig(arg1, arg2, arg3, arg4);
+//
+//    NSLog(@"PAT MusicMediaProfileDetailViewController:initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n",
+//          x,
+//          arg1,
+//          arg2,
+//          arg3,
+//          @(arg4));
+//
+//    return x;
+//}
+//
+//%end
+//
+//
+////MusicPreviewViewController
+//%hook MusicMediaProductDetailViewController
+//
+//-(id)initWithContainerEntityProvider:(MusicMediaEntityProvider *)arg1
+//tracklistEntityProvider:(MusicMediaEntityProvider *)arg2
+//clientContext:(id)arg3
+//existingJSProductNativeViewController:(id)arg4
+//{
+//    id x = %orig(arg1, arg2, arg3, arg4);
+//
+//    NSLog(@"PAT initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n", x, arg1, arg2, arg3, arg4);
+//
+//    NSLog(@"***\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n***",
+//          arg1.mediaQuery,
+//          arg1.mediaQueryDataSource.entities,
+//          arg2.mediaQuery,
+//          arg2.mediaQueryDataSource.entities);
+//
+//    return x;
+//}
+//
+//%end
+//
+//
+//%hook MusicMediaEntityProvider
+//
+//- (id)initWithMediaQuery:(id)arg1
+//{
+//    id x = %orig(arg1);
+//
+//    NSLog(@"PAT MusicMediaEntityProvider:initWithMediaQuery \n\n%@\n\n%@\n\n", x, arg1);
+//
+//    return x;
+//}
+//
+//%end
+
 
 
 

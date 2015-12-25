@@ -19,6 +19,8 @@ typedef enum {
 @property (strong, nonatomic) /*MusicClientContext*/ id clientContext;
 @property (strong, nonatomic) /*MusicTableView*/ UITableView *tableView;
 
+- (id)initWithLibraryViewConfiguration:(MusicLibraryViewConfiguration *)arg1;
+
 - (id)_entityValueContextAtIndexPath:(id)arg1;
 - (void)_configureEntityValueContextOutput:(id)arg1 forIndexPath:(id)arg2;
 
