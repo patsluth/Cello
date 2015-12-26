@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>cello_showinstore_enabled</key>
+	<true/>
+	<key>cello_startradiostation_enabled</key>
+	<true/>
+	<key>cello_upnext_enabled</key>
+	<true/>
+	<key>cello_addtoplaylist_enabled</key>
+	<true/>
+	<key>cello_makeavailableoffline_enabled</key>
+	<true/>
+	<key>cello_deleteremove_enabled</key>
+	<true/>
+</dict>
+</plist>

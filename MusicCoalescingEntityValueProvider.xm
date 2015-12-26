@@ -39,6 +39,15 @@
     return itemName;
 }
 
+- (id)valueForEntityProperty:(NSString *)arg1
+{
+    if ([arg1 isEqualToString:@"musicWantsContextualActionsButton"]) {
+        return @(NO);
+    }
+    
+    return %orig(arg1);
+}
+
 %end
 
 

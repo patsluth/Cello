@@ -1,6 +1,6 @@
 Package: com.patsluth.cello
 Name: Cello
-Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw
+Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw (>= 1.0-15)
 Architecture: iphoneos-arm
 Description: Slide music app cells to access contextual options. Supported actions include Delete, Download, Remove Download, Play Next, and Add to Up Next.
 Maintainer: Pat Sluth

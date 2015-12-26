@@ -33,13 +33,18 @@
 
 // Cello additions
 - (BOOL)showInStoreAvailable;
-- (BOOL)startStation;
+- (BOOL)startRadioStationAvailable;
 - (BOOL)upNextAvailable;
 - (BOOL)addToPlaylistAvailable;
+- (BOOL)makeAvailableOfflineAvailable;
+- (BOOL)removeFromPlaylistAvailable;
+- (BOOL)deleteAvailable;
 
 - (/*MPMediaConcreteItem **/ id)isConcreteMediaItem;
 - (/*MPConcreteMediaItemCollection **/ id)isConcreteMediaCollection;
 - (/*MPConcreteMediaPlaylist **/ id)isConcreteMediaPlaylist;
+
+- (void)log;
 
 @end
 

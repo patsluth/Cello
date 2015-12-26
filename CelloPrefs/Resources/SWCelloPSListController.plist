@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>title</key>
+	<string>Cello</string>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>label</key>
+			<string>Contextual Actions</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_showinstore_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Show In Store</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_startradiostation_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Start Radio Station</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_upnext_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Up Next</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_addtoplaylist_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Add to Playlist</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_makeavailableoffline_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Make Available Offline</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_deleteremove_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Delete</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Created By</string>
+		</dict>
+		<dict>
+			<key>cellClass</key>
+			<string>SWPSTwitterCell</string>
+			<key>username</key>
+			<string>patsluth</string>
+			<key>secondaryText</key>
+			<string>Developer</string>
+			<key>imagePath</key>
+			<string>/Library/PreferenceBundles/AcapellaPrefs2.bundle/Developer_Twitter_Profile.jpeg</string>
+			<key>action</key>
+			<string>viewTwitterProfile:</string>
+			<key>height</key>
+			<integer>80</integer>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>isStaticText</key>
+			<true/>
+			<key>label</key>
+			<string></string>
+			<key>footerText</key>
+			<string>© 2015 Pat Sluth - Sluthware</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>get</key>
+			<string>getVersionNumberForSpecifier:</string>
+			<key>label</key>
+			<string>Version</string>
+		</dict>
+	</array>
+</dict>
+</plist>

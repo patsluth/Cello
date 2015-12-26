@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = CelloPrefs;
+		cell = PSLinkCell;
+		detail = "SWCelloPSListController";
+		isController = 1;
+		icon = "Icon.png";
+		label = Cello;
+	};
+}

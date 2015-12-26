@@ -19,9 +19,9 @@ TARGET = iphone:clang:latest
 
 TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
-SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicEntityValueContext.xm MusicContextualActionsHeaderViewController.xm MusicLibraryBrowseTableViewController.xm MusicMediaDetailViewController.xm
+SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicEntityValueContext.xm MusicContextualActionsHeaderViewController.xm MusicLibraryBrowseTableViewController.xm MusicMediaDetailViewController.xm Prefs.xm
 SWCello_FRAMEWORKS = Foundation UIKit MediaPlayer
-SWCello_LIBRARIES = substrate
+SWCello_LIBRARIES = substrate sw packageinfo
 
 ADDITIONAL_CFLAGS = -Ipublic
 
@@ -29,8 +29,23 @@ ADDITIONAL_CFLAGS = -Ipublic
 
 
 
+BUNDLE_NAME = CelloSupport
+CelloSupport_INSTALL_PATH = /Library/Application Support
+
+
+
+
+
+SUBPROJECTS += CelloPrefs
+
+
+
+
+
 include theos/makefiles/common.mk
+include theos/makefiles/bundle.mk
 include theos/makefiles/tweak.mk
+include theos/makefiles/aggregate.mk
 include theos/makefiles/swcommon.mk
 
 

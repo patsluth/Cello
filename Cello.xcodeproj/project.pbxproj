@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		2E25F22D1C2F208500A38C5E /* Prefs.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = Prefs.xm; sourceTree = "<group>"; };
 		2E7C5E391C2B23A000AAC247 /* MusicContextualActionsHeaderViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicContextualActionsHeaderViewController.xm; sourceTree = "<group>"; };
 		2E7C5E3A1C2B2C4100AAC247 /* MusicCoalescingEntityValueProvider.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicCoalescingEntityValueProvider.xm; sourceTree = "<group>"; };
 		2EB72E8E1C2C427A0016825A /* MusicMediaDetailViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicMediaDetailViewController.xm; sourceTree = "<group>"; };
@@ -24,10 +25,11 @@
 				2EBB75811BE97C5A00A3A82D /* layout */,
 				2EBB758B1BE97C5A00A3A82D /* Makefile */,
 				2E7C5E3A1C2B2C4100AAC247 /* MusicCoalescingEntityValueProvider.xm */,
-				2EE8EDC21C2E13AD0092DD14 /* MusicEntityValueContext.xm */,
 				2E7C5E391C2B23A000AAC247 /* MusicContextualActionsHeaderViewController.xm */,
+				2EE8EDC21C2E13AD0092DD14 /* MusicEntityValueContext.xm */,
 				2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */,
 				2EB72E8E1C2C427A0016825A /* MusicMediaDetailViewController.xm */,
+				2E25F22D1C2F208500A38C5E /* Prefs.xm */,
 				2EBB75821BE97C5A00A3A82D /* public */,
 			);
 			sourceTree = "<group>";
