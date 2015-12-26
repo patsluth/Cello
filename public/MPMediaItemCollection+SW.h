@@ -12,9 +12,9 @@
 
 
 
-@interface MPMediaEntity(SW)
+@interface MPMediaItemCollection(SW)
 
-@property (strong, nonatomic) MPMediaItem *representativeItem;
+@property (readonly, nonatomic) MPMediaGrouping groupingType;
 
 @end
 

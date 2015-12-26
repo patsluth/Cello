@@ -14,7 +14,6 @@
 
 %hook MusicCoalescingEntityValueProvider
 
-
 %new
 - (NSString *)cello_EntityNameBestGuess
 {

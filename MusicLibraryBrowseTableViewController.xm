@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Pat Sluth. All rights reserved.
 //
 
+#import "SWCelloMediaEntityPreviewViewController.h"
+
 #import "MusicLibraryBrowseTableViewController.h"
 #import "MusicMediaAlbumDetailViewController.h"
 #import "MusicProfileAlbumsViewController.h"
@@ -25,15 +27,31 @@
 #import "MusicMediaEntityProvider.h"
 
 #import "MusicContextualUpNextAlertAction.h"
+#import "MusicContextualAddToPlaylistAlertAction.h"
 #import "MusicContextualLibraryUpdateAlertAction.h"
+//unused as of now
 #import "MusicContextualRemoveFromPlaylistAlertAction.h"
+#import "MusicContextualShowInStoreAlertAction.h"
+#import "MusicContextualStartStationAlertAction.h"
+//related
+#import "MusicContextualPlaylistPickerViewController.h"
 
-#import "MusicContextualActionsConfiguration.h"
+
+
+
+
+
+
+
+
+
+
+
 #import "MusicContextualActionsHeaderViewController.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
-
+#import "MPQueryPlaybackContext.h"
 
 
 #import "MPMediaEntity+SW.h"
@@ -48,103 +66,191 @@
 
 
 
-%hook MusicLibraryBrowseTableViewController
 
-//- (void)viewDidLoad
-//{
-//    %orig();
-//    
-//    // check device for 3D touch capability
-//    if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] &&
-//        self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-//        
-//        [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
-//        
-//    }
-//}
+
+%hook MusicProfileAlbumsViewController
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
+{
+    return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
+}
+
+%end
+
+%hook MusicProductTracklistTableViewController
+
+// peek
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
+{
+    return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
+}
+
+%end
+
+%hook MusicLibraryBrowseTableViewController
+
+// peek
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
+{
+    return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
+}
+
+%new
+- (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
     if (self.presentedViewController){
         return nil;
     }
 
-
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
+    
+    if (!indexPath) {
+        return nil;
+    }
+    
     UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-
-    // contains cached media properties
-    MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
-    coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
+    
 
     if (cell) {
         
+        // contains cached media properties
+        MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
+        coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
+        
         MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
+        NSMutableArray *actions = [@[] mutableCopy];
         
         
-        //set up actions
-        UIPreviewAction *playNextAction = [UIPreviewAction
-                                              actionWithTitle:@"Play Next"
-                                              style:UIPreviewActionStyleDefault
-                                              handler:^(UIPreviewAction * _Nonnull action,
-                                                        UIViewController * _Nonnull previewViewController) {
-
-                                                  [self cello_performUpNextAction:UpNextAlertAction_PlayNext forIndexPath:indexPath];
-
-                                              }];
-
-
-        UIPreviewAction *addToUpNextAction = [UIPreviewAction
-                                              actionWithTitle:@"Add to Up Next"
-                                              style:UIPreviewActionStyleDefault
-                                              handler:^(UIPreviewAction * _Nonnull action,
-                                                        UIViewController * _Nonnull previewViewController) {
-
-                                                  [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forIndexPath:indexPath];
-
-                                              }];
+        if ([valueContext showInStoreAvailable]) {
+            
+            UIPreviewAction *showInStoreAction = [UIPreviewAction
+                                                   actionWithTitle:@"Show in iTunes Store"
+                                                   style:UIPreviewActionStyleDefault
+                                                   handler:^(UIPreviewAction * _Nonnull action,
+                                                             UIViewController * _Nonnull previewViewController) {
+                                                       
+                                                       [self cello_performShowInStoreActionForValueContext:valueContext];
+                                                       
+                                                   }];
+            [actions addObject: showInStoreAction];
+            
+        }
+        
+        
+        if ([valueContext startStation]) {
+            
+            UIPreviewAction *startStationAction = [UIPreviewAction
+                                                   actionWithTitle:@"Start Station"
+                                                   style:UIPreviewActionStyleDefault
+                                                   handler:^(UIPreviewAction * _Nonnull action,
+                                                             UIViewController * _Nonnull previewViewController) {
+                                                       
+                                                       [self cello_performStartStationActionForValueContext:valueContext];
+                                                       
+                                                   }];
+            [actions addObject: startStationAction];
+            
+        }
+        
+        
+        if ([valueContext upNextAvailable]) {
+            
+            UIPreviewAction *playNextAction = [UIPreviewAction
+                                               actionWithTitle:@"Play Next"
+                                               style:UIPreviewActionStyleDefault
+                                               handler:^(UIPreviewAction * _Nonnull action,
+                                                         UIViewController * _Nonnull previewViewController) {
+                                                   
+                                                   [self cello_performUpNextAction:UpNextAlertAction_PlayNext forValueContext:valueContext];
+                                                   
+                                               }];
+            [actions addObject: playNextAction];
+            
+            
+            UIPreviewAction *addToUpNextAction = [UIPreviewAction
+                                                  actionWithTitle:@"Add to Up Next"
+                                                  style:UIPreviewActionStyleDefault
+                                                  handler:^(UIPreviewAction * _Nonnull action,
+                                                            UIViewController * _Nonnull previewViewController) {
+                                                      
+                                                      [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forValueContext:valueContext];
+                                                      
+                                                  }];
+            [actions addObject: addToUpNextAction];
+            
+        }
+        
+        
+        if ([valueContext addToPlaylistAvailable]) {
+            
+            UIPreviewAction *addToPlaylistAction = [UIPreviewAction
+                                                    actionWithTitle:@"Add to Playlist"
+                                                    style:UIPreviewActionStyleDefault
+                                                    handler:^(UIPreviewAction * _Nonnull action,
+                                                              UIViewController * _Nonnull previewViewController) {
+                                                        
+                                                        [self cello_performAddToPlaylistActionForValueContext:valueContext];
+                                                        
+                                                    }];
+            [actions addObject: addToPlaylistAction];
+            
+        }
 
 
         // so we know if the item is already downloaded or not
         NSNumber *keepLocal = [coalescingEntityValueProvider valueForEntityProperty:@"keepLocal"];
         UIPreviewAction *downloadAction = [UIPreviewAction
-                                         actionWithTitle:(keepLocal.boolValue ? @"Remove Download" : @"Download")
+                                         actionWithTitle:(keepLocal.boolValue ? @"Remove Download" : @"Make Available Offline")
                                          style:UIPreviewActionStyleDefault
                                          handler:^(UIPreviewAction * _Nonnull action,
                                                    UIViewController * _Nonnull previewViewController) {
 
-                                             [self cello_performDownloadActionForIndexPath:indexPath];
+                                             [self cello_performDownloadActionForValueContext:valueContext];
 
                                          }];
-
-
+        [actions addObject: downloadAction];
+        
+        
         UIPreviewAction *deleteAction = [UIPreviewAction
                                          actionWithTitle:@"Delete"
                                          style:UIPreviewActionStyleDestructive
                                          handler:^(UIPreviewAction * _Nonnull action,
                                                    UIViewController * _Nonnull previewViewController) {
-
+                                             
                                              UIAlertController *deleteConfirmController = [self cello_deleteConfirmationAlertController:indexPath];
                                              [self presentViewController:deleteConfirmController animated:YES completion:nil];
-
+                                             
                                          }];
+        [actions addObject: deleteAction];
         
         
-        MusicMediaDetailViewController *previewViewController = [self.libraryViewConfiguration
-                                                             previewViewControllerForEntityValueContext:valueContext fromViewController:nil];
+        
+        
+        
+        
+        UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController;
+        previewViewController= [self.libraryViewConfiguration previewViewControllerForEntityValueContext:valueContext
+                                                                                      fromViewController:nil];
         
         if (!previewViewController) { // unsupported Media type
             previewViewController = [self cello_previewViewControllerForEntityValueContext:valueContext];
         }
         
         
-        // make sure header view is layed out and set our content size to it's height
-        [previewViewController.view layoutSubviews];
-        previewViewController.preferredContentSize = CGSizeMake(0.0, CGRectGetHeight(previewViewController.headerContentViewController.view.bounds));
+        // Cut these views down to size to only show the header in the preview
+        if ([previewViewController isKindOfClass:%c(MusicMediaDetailViewController)]) {
+            
+            MusicMediaDetailViewController *mediaDetailViewController = (MusicMediaDetailViewController *)previewViewController;
+            // make sure header view is layed out and set our content size to it's height
+            [mediaDetailViewController.view layoutSubviews];
+            [mediaDetailViewController _updateMaximumHeaderHeight];
+            
+            mediaDetailViewController.preferredContentSize = CGSizeMake(0.0, mediaDetailViewController.maximumHeaderSize.height);
+            
+        }
         
-        previewViewController.celloPreviewActionItems = @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
-        
+        previewViewController.celloPreviewActionItems = [actions copy];
         return previewViewController;
     }
 
@@ -153,7 +259,18 @@
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
 {
-    [self showViewController:viewControllerToCommit sender:self];
+    if ([viewControllerToCommit isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) {
+        
+        // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
+        // This will simulate clicking the contextual action header view, opening the view controller for the collection
+        MusicContextualActionsHeaderViewController *headerVC = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
+        [self.libraryViewConfiguration handleSelectionOfEntityValueContext:headerVC.entityValueContext fromViewController:self];
+        
+    } else {
+        
+        [self showViewController:viewControllerToCommit sender:self];
+        
+    }
 }
 
 #pragma mark - UITableViewEditing
@@ -189,41 +306,53 @@
     return UITableViewCellEditingStyleNone;
 }
 
-- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return NO;
-}
-
 %new
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    
+    
+    if (!cell) {
+        return nil;
+    }
+    
+    
     // contains cached media properties
     MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
     coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
     
+    MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
+    NSMutableArray *actions = [@[] mutableCopy];
     
     
-    UITableViewRowAction *playNextAction = [UITableViewRowAction
-                                            rowActionWithStyle:UITableViewRowActionStyleNormal
-                                            title:@"Play\nNext"
-                                            handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                
-                                                [self cello_performUpNextAction:UpNextAlertAction_PlayNext forIndexPath:indexPath];
-                                                [self.tableView setEditing:NO animated:YES];
-                                                
-                                            }];
-    
-    
-    UITableViewRowAction *addToUpNextAction = [UITableViewRowAction
-                                          rowActionWithStyle:UITableViewRowActionStyleNormal
-                                          title:@"Up\nNext"
-                                          handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                              
-                                              [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forIndexPath:indexPath];
-                                              [self.tableView setEditing:NO animated:YES];
-                                              
-                                          }];
+    if ([valueContext upNextAvailable]) {
+        
+        UITableViewRowAction *playNextAction = [UITableViewRowAction
+                                                rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                title:@"Play\nNext"
+                                                handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+                                                    
+                                                    [self cello_performUpNextAction:UpNextAlertAction_PlayNext forValueContext:valueContext];
+                                                    [self.tableView setEditing:NO animated:YES];
+                                                    
+                                                }];
+        playNextAction.backgroundColor = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
+        [actions addObject:playNextAction];
+        
+        
+        UITableViewRowAction *addToUpNextAction = [UITableViewRowAction
+                                                   rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                   title:@"Up\nNext"
+                                                   handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+                                                       
+                                                       [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forValueContext:valueContext];
+                                                       [self.tableView setEditing:NO animated:YES];
+                                                       
+                                                   }];
+        addToUpNextAction.backgroundColor = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
+        [actions addObject:addToUpNextAction];
+        
+    }
     
     
     // so we know if the item is already downloaded or not
@@ -235,13 +364,15 @@
                                               
                                               [CATransaction begin];
                                               [CATransaction setCompletionBlock: ^{
-                                                  [self cello_performDownloadActionForIndexPath:indexPath];
+                                                  [self cello_performDownloadActionForValueContext:valueContext];
                                               }];
                                               [self.tableView setEditing:NO animated:YES];
                                               [CATransaction commit];
                                               
                                               
                                           }];
+    downloadAction.backgroundColor = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
+    [actions addObject:downloadAction];
     
     
     UITableViewRowAction *deleteAction = [UITableViewRowAction
@@ -253,12 +384,10 @@
                                               [self presentViewController:deleteConfirmController animated:YES completion:nil];
                                               
                                           }];
+    [actions addObject:deleteAction];
     
-    playNextAction.backgroundColor = [UIColor darkGrayColor];
-    addToUpNextAction.backgroundColor = [UIColor grayColor];
-    downloadAction.backgroundColor = [UIColor lightGrayColor];
     
-    return @[playNextAction, addToUpNextAction, downloadAction, deleteAction];
+    return [actions copy];
 }
 
 #pragma mark - Cello Additions
@@ -278,6 +407,7 @@
         valueContext.wantsContainerIdentifierCollection = YES;
         valueContext.wantsItemPlaybackContext = YES;
         valueContext.wantsContainerPlaybackContext = YES;
+        
         [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
         
     }
@@ -286,39 +416,43 @@
 }
 
 %new
-- (UIViewController *)cello_previewViewControllerForEntityValueContext:(MusicEntityValueContext *)entityValueContext
+- (UIViewController<SWCelloMediaEntityPreviewViewController> *)cello_previewViewControllerForEntityValueContext:(MusicEntityValueContext *)valueContext
 {
-    id provider = entityValueContext.entityValueProvider;
-    MusicMediaDetailViewController *previewViewController = nil;
-    // the base media item
-    MPMediaItem *mediaItem = ((MPMediaEntity *)entityValueContext.entityValueProvider).representativeItem;
+    UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController = nil;
     
     
-    if ([provider isKindOfClass:%c(MPConcreteMediaItem)]) { // song
+    if ([valueContext isConcreteMediaItem]) { // song
         
+        // the base media item
+        MPMediaItem *mediaItem = ((MPMediaEntity *)[valueContext isConcreteMediaItem]).representativeItem;
         
         MPMediaPropertyPredicate *queryPredicate = [MPMediaPropertyPredicate predicateWithValue:@(mediaItem.albumPersistentID)
                                                                                     forProperty:MPMediaItemPropertyAlbumPersistentID];
         
         
         MPMediaQuery *albumQuery = [MPMediaQuery albumsQuery];
-        MPMediaQuery *albumTitlesQuery = [MPMediaQuery songsQuery];
+        MPMediaQuery *titlesQuery = [MPMediaQuery songsQuery];
         
         [albumQuery addFilterPredicate:queryPredicate];
-        [albumTitlesQuery addFilterPredicate:queryPredicate];
+        [titlesQuery addFilterPredicate:queryPredicate];
         
         MusicMediaEntityProvider *albumProvider = [[%c(MusicMediaEntityProvider) alloc] initWithMediaQuery:albumQuery];
-        MusicMediaEntityProvider *albumTitlesTitlesProvider = [[%c(MusicMediaEntityProvider) alloc] initWithMediaQuery:albumTitlesQuery];
+        MusicMediaEntityProvider *titlesProvider = [[%c(MusicMediaEntityProvider) alloc] initWithMediaQuery:titlesQuery];
         
         previewViewController = [[%c(MusicMediaAlbumDetailViewController) alloc] initWithContainerEntityProvider:albumProvider
-                                                                                         tracklistEntityProvider:albumTitlesTitlesProvider
+                                                                                         tracklistEntityProvider:titlesProvider
                                                                                                    clientContext:self.clientContext
                                                                            existingJSProductNativeViewController:nil];
         
         
-    } else if ([provider isKindOfClass:%c(MPConcreteMediaItemCollection)]) { // artist, album, genre, etc
+    } else if ([valueContext isConcreteMediaCollection]) { // media collection (genre, compilation, etc)
         
-        // TODO:
+        // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
+        // This will simulate clicking the contextual action header view, opening the view controller for the collection
+        previewViewController = [[%c(MusicContextualActionsHeaderViewController) alloc]
+                                 initWithEntityValueContext:valueContext
+                                 contextualActions:nil];
+        previewViewController.view.backgroundColor = [UIColor whiteColor];
         
     }
     
@@ -326,10 +460,26 @@
 }
 
 %new
-- (void)cello_performUpNextAction:(UpNextAlertAction_Type)actionType forIndexPath:(NSIndexPath *)indexPath
+- (void)cello_performShowInStoreActionForValueContext:(MusicEntityValueContext *)valueContext
 {
-    MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
+    MusicContextualShowInStoreAlertAction *contextAction;
+    contextAction = [%c(MusicContextualShowInStoreAlertAction) contextualShowInStoreActionWithEntityValueContext:valueContext
+                                                                                               didDismissHandler:nil];
+    [contextAction performContextualAction];
+}
+
+%new
+- (void)cello_performStartStationActionForValueContext:(MusicEntityValueContext *)valueContext
+{
+    MusicContextualStartStationAlertAction *contextAction;
+    contextAction = [%c(MusicContextualStartStationAlertAction) contextualStartStationActionWithEntityValueContext:valueContext];
     
+    [contextAction performContextualAction];
+}
+
+%new
+- (void)cello_performUpNextAction:(UpNextAlertAction_Type)actionType forValueContext:(MusicEntityValueContext *)valueContext
+{
     MusicContextualUpNextAlertAction *contextAction = [%c(MusicContextualUpNextAlertAction)
                                                       contextualUpNextActionWithEntityValueContext:valueContext
                                                       insertionType:actionType
@@ -339,10 +489,25 @@
 }
 
 %new
-- (void)cello_performDownloadActionForIndexPath:(NSIndexPath *)indexPath
+- (void)cello_performAddToPlaylistActionForValueContext:(MusicEntityValueContext *)valueContext
 {
-    MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
+    MusicContextualAddToPlaylistAlertAction *contextAction;
+    contextAction = [%c(MusicContextualAddToPlaylistAlertAction)
+                     contextualAddToPlaylistActionForEntityValueContext:valueContext
+                     shouldDismissHandler:nil
+                     additionalPresentationHandler:^(MusicContextualPlaylistPickerViewController *arg1){
+                         
+                         [self presentViewController:arg1 animated:YES completion:nil];
+                         
+                     }
+                     didDismissHandler:nil];
     
+    [contextAction performContextualAction];
+}
+
+%new
+- (void)cello_performDownloadActionForValueContext:(MusicEntityValueContext *)valueContext
+{
     MusicContextualLibraryUpdateAlertAction *contextAction;
     [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:nil
                                                                      keepLocalAction:&contextAction
@@ -354,17 +519,15 @@
     [contextAction performContextualAction];
 }
 
-%new
-- (void)cello_performRemoveFromPlaylistActionForIndexPath:(NSIndexPath *)indexPath
-{
-    MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
-    
-    MusicContextualRemoveFromPlaylistAlertAction *contextAction;
-    contextAction = [%c(MusicContextualRemoveFromPlaylistAlertAction)
-                     contextualRemoveFromPlaylistActionWithEntityValueContext:valueContext];
-    
-    [contextAction performContextualAction];
-}
+//%new
+//- (void)cello_performRemoveFromPlaylistActionForValueContext:(MusicEntityValueContext *)valueContext
+//{
+//    MusicContextualRemoveFromPlaylistAlertAction *contextAction;
+//    contextAction = [%c(MusicContextualRemoveFromPlaylistAlertAction)
+//                     contextualRemoveFromPlaylistActionWithEntityValueContext:valueContext];
+//    
+//    [contextAction performContextualAction];
+//}
 
 %new
 - (UIAlertController *)cello_deleteConfirmationAlertController:(NSIndexPath *)indexPath
@@ -397,6 +560,28 @@
                                    handler:^(UIAlertAction * action) {
                                        
                                        MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
+                                       
+                                       // special situation with single items in a playlist
+                                       // this allows them to be deleted as well by constructing a new query for the item
+                                       // without it's playlist referenced
+                                       if ([(id)valueContext.entityValueProvider isKindOfClass:%c(MPConcreteMediaItem)]) {
+                                           
+                                           MPMediaEntity *mediaItem = (MPMediaEntity *)valueContext.entityValueProvider;
+                                           
+                                           MPMediaPropertyPredicate *queryPredicate = [MPMediaPropertyPredicate predicateWithValue:@(mediaItem.persistentID)
+                                                                                                                       forProperty:MPMediaItemPropertyPersistentID];
+                                           
+                                           MPMediaQuery *titlesQuery = [MPMediaQuery songsQuery];
+                                           [titlesQuery addFilterPredicate:queryPredicate];
+                                           
+                                           if (titlesQuery.items.count == 1) {
+                                               valueContext = [[%c(MusicEntityValueContext) alloc] init];
+                                               [valueContext configureWithMediaEntity:titlesQuery.items[0]];
+                                           } else {
+                                               NSLog(@"Cello - Error constructing query");
+                                           }
+                                           
+                                       }
                                        
                                        MusicContextualLibraryUpdateAlertAction *contextAction;
                                        [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:&contextAction
@@ -495,8 +680,9 @@
 
 
 
-#pragma mark - Media Query View Controller Mapping DEBUG
-
+//#pragma mark - Media Query View Controller Mapping DEBUG
+// shows exacty details of system media queries for each type of media view controller
+//
 //%hook MusicMediaProfileDetailViewController
 //
 //-(id)initWithContainerEntityProvider:(id)arg1
@@ -528,33 +714,62 @@
 //existingJSProductNativeViewController:(id)arg4
 //{
 //    id x = %orig(arg1, arg2, arg3, arg4);
-//
-//    NSLog(@"PAT initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n", x, arg1, arg2, arg3, arg4);
-//
+//    
+//    NSLog(@"Cello MusicMediaProductDetailViewController:initWithContainerEntityProvider \n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n", x,
+//          arg1,
+//          arg2,
+//          arg3,
+//          arg4);
+//    
 //    NSLog(@"***\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n%@\n\n\n\n***",
 //          arg1.mediaQuery,
 //          arg1.mediaQueryDataSource.entities,
 //          arg2.mediaQuery,
 //          arg2.mediaQueryDataSource.entities);
-//
+//    
 //    return x;
 //}
 //
 //%end
-//
-//
-//%hook MusicMediaEntityProvider
-//
-//- (id)initWithMediaQuery:(id)arg1
-//{
-//    id x = %orig(arg1);
-//
-//    NSLog(@"PAT MusicMediaEntityProvider:initWithMediaQuery \n\n%@\n\n%@\n\n", x, arg1);
-//
-//    return x;
-//}
-//
-//%end
+
+
+
+%hook MusicContextualAddToPlaylistAlertAction
+
++ (id)contextualAddToPlaylistActionForEntityValueContext:(MusicEntityValueContext *)arg1
+shouldDismissHandler:(/*^block*/id)arg2
+additionalPresentationHandler:(/*^block*/id)arg3
+didDismissHandler:(/*^block*/id)arg4
+{
+    id x = %orig(arg1, arg2, arg3, arg4);
+    
+    NSLog(@"\n\n\nx %@", x);
+    NSLog(@"arg2 %@", arg2);
+    NSLog(@"arg3 %@", arg3);
+    NSLog(@"arg4 %@", arg4);
+    NSLog(@"entityValueProvider %@", arg1.entityValueProvider);
+    NSLog(@"containerEntityValueProvider %@", arg1.containerEntityValueProvider);
+    NSLog(@"itemIdentifierCollection %@", arg1.itemIdentifierCollection);
+    NSLog(@"containerIdentifierCollection %@\n\n\n", arg1.containerIdentifierCollection);
+    
+    return x;
+}
+
+%end
+
+%hook MusicContextualPlaylistPickerViewController
+
+- (id)initWithPlaylistSelectionHandler:(/*^block*/id)arg1
+{
+    id x = %orig(arg1);
+    
+    NSLog(@"\n\n\nx %@", x);
+    NSLog(@"arg1 %@", arg1);
+    
+    return x;
+}
+
+%end
 
 
 

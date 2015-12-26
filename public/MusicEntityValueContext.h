@@ -1,7 +1,7 @@
 
-#import "MusicEntityProviding.h"
+#import "MusicEntityValueProviding.h"
 
-@class MPUContentItemIdentifierCollection, MPPlaybackContext;
+@class MPUContentItemIdentifierCollection, MPPlaybackContext, MPQueryPlaybackContext;
 
 
 
@@ -10,6 +10,8 @@
 @interface MusicEntityValueContext : NSObject
 {
 }
+
+- (void)configureWithMediaEntity:(id)arg1;
 
 @property (assign,nonatomic) BOOL wantsItemGlobalIndex;
 @property (assign,nonatomic) BOOL wantsItemEntityValueProvider;
@@ -24,10 +26,20 @@
 @property (nonatomic, retain) id<MusicEntityValueProviding> containerEntityValueProvider;
 @property (nonatomic, copy) MPUContentItemIdentifierCollection *itemIdentifierCollection;
 @property (nonatomic, copy) MPUContentItemIdentifierCollection *containerIdentifierCollection;
-@property (nonatomic, retain) MPPlaybackContext *itemPlaybackContext; // individual song
-@property (nonatomic, retain) MPPlaybackContext *containerPlaybackContext; // album, artist, playlist, etc
+@property (nonatomic, retain) MPQueryPlaybackContext *itemPlaybackContext; // individual song
+@property (nonatomic, retain) MPQueryPlaybackContext *containerPlaybackContext; // album, artist, playlist, etc
 
 - (void)resetOutputValues;
+
+// Cello additions
+- (BOOL)showInStoreAvailable;
+- (BOOL)startStation;
+- (BOOL)upNextAvailable;
+- (BOOL)addToPlaylistAvailable;
+
+- (/*MPMediaConcreteItem **/ id)isConcreteMediaItem;
+- (/*MPConcreteMediaItemCollection **/ id)isConcreteMediaCollection;
+- (/*MPConcreteMediaPlaylist **/ id)isConcreteMediaPlaylist;
 
 @end
 

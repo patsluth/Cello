@@ -13,11 +13,10 @@
 
 
 
-@interface MusicMediaEntityProvider : NSObject <MusicEntityProviding, NSCoding>
+@interface MusicMediaEntityProvider : NSObject <MusicEntityProviding>
 {
 }
 
-@property (assign, nonatomic) long long maximumItemCount;
 @property (nonatomic, readonly) MusicMediaQueryDataSource *mediaQueryDataSource;
 @property (nonatomic, retain) MPMediaQuery *mediaQuery;
 
