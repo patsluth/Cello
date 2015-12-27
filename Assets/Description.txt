@@ -1,0 +1,38 @@
+Description
+
+	Quick access to media contextual actions via 3D Touch and 
+		Tableview Cell sliding in the Music app.
+
+Features
+
+	Adds 3D touch support to all media types in the Music App
+		(Playlist, Song, Artist, Album, Genre, Compilation, Composer, etc)
+
+	Use 3D Touch Peek to activate the following contextual actions
+
+		- Show in iTunes Store
+		- Start Radio Station
+		- Play Next
+		- Add to Up Next
+		- Add to Playlist
+		- Make Available Offline / Remove Download
+		- Delete / Remove from Playlist
+
+	Use 3D Touch Pop to activate the preview view. You can also customize this to perform
+		any of the above actions.
+
+	Slide to Media cell activate the following contextual actions
+
+		- Play Next
+		- Add to Up Next
+		- Make Available Offline / Remove Download
+		- Delete / Remove from Playlist
+
+
+
+Youtube Link
+
+	https://www.youtube.com/watch?v=aE5pI7SQBjU
+
+	
+
