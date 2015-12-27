@@ -39,6 +39,11 @@
 
 
 
+#import "SWCelloPrefs.h"
+
+
+
+
 
 @protocol Cello_MusicEntityTableViewCellValueProviding
 @required
@@ -83,10 +88,33 @@
 
 %hook MusicLibraryBrowseTableViewController
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)viewDidAppear:(BOOL)animated
 {
-    self.view.clipsToBounds = YES;
     %orig(animated);
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(cello_refreshPrefs)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+    
+    self.celloPrefs = [[SWCelloPrefs alloc] init];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    %orig(animated);
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    // remove our associated object
+    self.celloPrefs = nil;
+    self.celloCurrentPreviewingIndexPath = nil;
+}
+
+%new
+- (void)cello_refreshPrefs
+{
+    self.celloPrefs = [[SWCelloPrefs alloc] init];
 }
 
 // peek
@@ -94,6 +122,8 @@
 {
     return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
 }
+
+static NSIndexPath *previewingIndexPath;
 
 %new
 - (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -103,6 +133,7 @@
     }
 
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
+    self.celloCurrentPreviewingIndexPath = indexPath;
     
     if (!indexPath) {
         return nil;
@@ -113,15 +144,11 @@
 
     if (cell) {
         
-        // contains cached media properties
-        MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
-        coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
-        
         __block MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
         NSMutableArray *actions = [@[] mutableCopy];
         
         
-        if ([valueContext showInStoreAvailable]) {
+        if (self.celloPrefs.showInStore_peek && [valueContext showInStoreAvailable]) {
             
             UIPreviewAction *showInStoreAction = [UIPreviewAction
                                                    actionWithTitle:@"Show in iTunes Store"
@@ -137,7 +164,7 @@
         }
         
         
-        if ([valueContext startRadioStationAvailable]) {
+        if (self.celloPrefs.startRadioStation_peek && [valueContext startRadioStationAvailable]) {
             
             UIPreviewAction *startRadioStationAction = [UIPreviewAction
                                                         actionWithTitle:@"Start Radio Station"
@@ -153,7 +180,7 @@
         }
         
         
-        if ([valueContext upNextAvailable]) {
+        if (self.celloPrefs.upNext_peek && [valueContext upNextAvailable]) {
             
             UIPreviewAction *playNextAction = [UIPreviewAction
                                                actionWithTitle:@"Play Next"
@@ -183,7 +210,7 @@
         }
         
         
-        if ([valueContext addToPlaylistAvailable]) {
+        if (self.celloPrefs.addToPlaylist_peek && [valueContext addToPlaylistAvailable]) {
             
             UIPreviewAction *addToPlaylistAction = [UIPreviewAction
                                                     actionWithTitle:@"Add to Playlist"
@@ -199,7 +226,11 @@
         }
 
 
-        if ([valueContext makeAvailableOfflineAvailable]) {
+        if (self.celloPrefs.makeAvailableOffline_peek && [valueContext makeAvailableOfflineAvailable]) {
+            
+            // contains cached media properties
+            MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
+            coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
             
             // so we know if the item is already downloaded or not
             NSNumber *keepLocal = [coalescingEntityValueProvider valueForEntityProperty:@"keepLocal"];
@@ -228,7 +259,7 @@
         }
         
         
-        if ([valueContext deleteAvailable]) {
+        if (self.celloPrefs.deleteRemove_peek && [valueContext deleteAvailable]) {
             
             UIPreviewAction *deleteAction = [UIPreviewAction
                                              actionWithTitle:@"Delete"
@@ -282,25 +313,57 @@
 %new
 - (void)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
 {
-    if ([viewControllerToCommit isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) {
-        
-        // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
-        // This will simulate clicking the contextual action header view, opening the view controller for the collection
-        MusicContextualActionsHeaderViewController *headerVC = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
-        [self.libraryViewConfiguration handleSelectionOfEntityValueContext:headerVC.entityValueContext fromViewController:nil];
+    if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_PushViewController) {
+    
+        if ([viewControllerToCommit isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) {
+            
+            // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
+            // This will simulate clicking the contextual action header view, opening the view controller for the collection
+            MusicContextualActionsHeaderViewController *headerVC = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
+            [self.libraryViewConfiguration handleSelectionOfEntityValueContext:headerVC.entityValueContext fromViewController:nil];
+            
+        } else {
+            
+            [self showViewController:viewControllerToCommit sender:nil];
+            
+        }
         
     } else {
         
-        [self showViewController:viewControllerToCommit sender:nil];
+        //MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:self.celloCurrentPreviewingIndexPath];
+        
+        if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_ShowInStore) {
+            [self cello_performShowInStoreActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+        } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_StartRadioStation) {
+            [self cello_performStartStationActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+        } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_PlayNext) {
+            [self cello_performUpNextAction:UpNextAlertAction_PlayNext forIndexPath:self.celloCurrentPreviewingIndexPath];
+        } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_AddToUpNext) {
+            [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forIndexPath:self.celloCurrentPreviewingIndexPath];
+        } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_AddToPlaylist) {
+            [self cello_performAddToPlaylistActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+        } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_ToggleKeepLocal) {
+            [self cello_performDownloadActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+        } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_Delete) {
+            UIAlertController *deleteConfirmController = [self cello_deleteConfirmationAlertController:self.celloCurrentPreviewingIndexPath];
+            [self presentViewController:deleteConfirmController animated:YES completion:nil];
+        }
         
     }
+    
+    self.celloCurrentPreviewingIndexPath = nil;
 }
 
 #pragma mark - UITableViewEditing
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return YES;
+    // if all options are disabled then don't allow sliding
+    if (self.celloPrefs.upNext_slide || self.celloPrefs.makeAvailableOffline_slide || self.celloPrefs.deleteRemove_slide) {
+        return YES;
+    } else {
+        return %orig(tableView, indexPath);
+    }
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -309,22 +372,26 @@
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    
-    if ([(id)cell.entityValueProvider isKindOfClass:%c(MusicCoalescingEntityValueProvider)]) {
+    // if all options are disabled then don't allow sliding
+    if (self.celloPrefs.upNext_slide || self.celloPrefs.makeAvailableOffline_slide || self.celloPrefs.deleteRemove_slide) {
         
+        UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
         
-        // contains cached media properties
-        MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
-        coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
-        
-        if ([[(id)coalescingEntityValueProvider.baseEntityValueProvider class] isSubclassOfClass:%c(MPMediaEntity)]){ // media cell
+        if ([(id)cell.entityValueProvider isKindOfClass:%c(MusicCoalescingEntityValueProvider)]) {
             
-            return UITableViewCellEditingStyleDelete;
             
+            // contains cached media properties
+            MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
+            coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
+            
+            if ([[(id)coalescingEntityValueProvider.baseEntityValueProvider class] isSubclassOfClass:%c(MPMediaEntity)]){ // media cell
+                
+                return UITableViewCellEditingStyleDelete;
+                
+            }
         }
+        
     }
-    
     
     // not a media cell
     return UITableViewCellEditingStyleNone;
@@ -340,16 +407,11 @@
         return nil;
     }
     
-    
-    // contains cached media properties
-    MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
-    coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
-    
     MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
     NSMutableArray *actions = [@[] mutableCopy];
     
     
-    if ([valueContext upNextAvailable]) {
+    if (self.celloPrefs.upNext_slide && [valueContext upNextAvailable]) {
         
         UITableViewRowAction *playNextAction = [UITableViewRowAction
                                                 rowActionWithStyle:UITableViewRowActionStyleNormal
@@ -379,7 +441,11 @@
     }
     
     
-    if ([valueContext makeAvailableOfflineAvailable]) {
+    if (self.celloPrefs.makeAvailableOffline_slide && [valueContext makeAvailableOfflineAvailable]) {
+        
+        // contains cached media properties
+        MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
+        coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
         
         // so we know if the item is already downloaded or not
         NSNumber *keepLocal = [coalescingEntityValueProvider valueForEntityProperty:@"keepLocal"];
@@ -403,7 +469,7 @@
     }
     
     
-    if ([valueContext deleteAvailable]) {
+    if (self.celloPrefs.deleteRemove_slide && [valueContext deleteAvailable]) {
      
         UITableViewRowAction *deleteAction = [UITableViewRowAction
                                               rowActionWithStyle:UITableViewRowActionStyleDestructive
@@ -698,6 +764,30 @@
     popPresenter.sourceRect = cell.bounds;
     
     return controller;
+}
+
+%new
+- (SWCelloPrefs *)celloPrefs
+{
+    return objc_getAssociatedObject(self, @selector(_celloPrefs));
+}
+
+%new
+- (void)setCelloPrefs:(SWCelloPrefs *)celloPrefs
+{
+    objc_setAssociatedObject(self, @selector(_celloPrefs), celloPrefs, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+%new
+- (NSIndexPath *)celloCurrentPreviewingIndexPath
+{
+    return objc_getAssociatedObject(self, @selector(_celloCurrentPreviewingIndexPath));
+}
+
+%new
+- (void)setCelloCurrentPreviewingIndexPath:(NSIndexPath *)celloCurrentPreviewingIndexPath
+{
+    objc_setAssociatedObject(self, @selector(_celloCurrentPreviewingIndexPath), celloCurrentPreviewingIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 %end

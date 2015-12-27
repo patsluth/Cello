@@ -8,15 +8,51 @@
 	<array>
 		<dict>
 			<key>cell</key>
-			<string>PSTitleValueCell</string>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
 			<key>label</key>
-			<string>Contextual Actions</string>
+			<string>Pop Action</string>
+			<key>key</key>
+			<string>cello_popaction_type</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>validTitles</key>
+			<array>
+				<string>Push View Controller</string>
+				<string>Show in iTunes Store</string>
+				<string>Start Radio Station</string>
+				<string>Play Next</string>
+				<string>Add to Up Next</string>
+				<string>Add to Playlist</string>
+				<string>Make Available Offline</string>
+				<string>Delete</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+			</array>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Peek Contextual Actions</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_showinstore_enabled</string>
+			<string>cello_showinstore_peek_enabled</string>
 			<key>default</key>
 			<true/>
 			<key>label</key>
@@ -28,7 +64,7 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_startradiostation_enabled</string>
+			<string>cello_startradiostation_peek_enabled</string>
 			<key>default</key>
 			<true/>
 			<key>label</key>
@@ -40,7 +76,7 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_upnext_enabled</string>
+			<string>cello_upnext_peek_enabled</string>
 			<key>default</key>
 			<true/>
 			<key>label</key>
@@ -52,7 +88,7 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_addtoplaylist_enabled</string>
+			<string>cello_addtoplaylist_peek_enabled</string>
 			<key>default</key>
 			<true/>
 			<key>label</key>
@@ -64,7 +100,7 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_makeavailableoffline_enabled</string>
+			<string>cello_makeavailableoffline_peek_enabled</string>
 			<key>default</key>
 			<true/>
 			<key>label</key>
@@ -76,13 +112,80 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_deleteremove_enabled</string>
+			<string>cello_deleteremove_peek_enabled</string>
 			<key>default</key>
 			<true/>
 			<key>label</key>
 			<string>Delete</string>
 			<key>defaults</key>
 			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Cell Swipe Contextual Actions</string>
+			<key>footerText</key>
+			<string>Disable all values to disable tableview cell sliding</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_upnext_slide_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Up Next</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_makeavailableoffline_slide_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Make Available Offline</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>key</key>
+			<string>cello_deleteremove_slide_enabled</string>
+			<key>default</key>
+			<true/>
+			<key>label</key>
+			<string>Delete</string>
+			<key>defaults</key>
+			<string>com.apple.Music</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Reset All Settings</string>
+			<key>confirmation</key>
+			<dict>
+				<key>title</key>
+				<string>Reset All Settings</string>
+				<key>prompt</key>
+				<string>Are you sure you want to reset all settings?</string>
+				<key>okTitle</key>
+				<string>Yes</string>
+				<key>cancelTitle</key>
+				<string>No</string>
+			</dict>
+			<key>action</key>
+			<string>resetAllSettings:</string>
 		</dict>
 		<dict>
 			<key>cell</key>

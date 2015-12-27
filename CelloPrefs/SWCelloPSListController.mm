@@ -10,7 +10,6 @@
 
 #import "libsw/libSluthware/libSluthware.h"
 #import "libsw/SWPSListController.h"
-#import "libsw/SWPSTwitterCell.h"
 
 
 
@@ -28,32 +27,22 @@
 
 @implementation SWCelloPSListController
 
-#pragma mark Twitter
-
-- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier
+- (void)resetAllSettings:(PSSpecifier *)specifier
 {
-    [super setPreferenceValue:value specifier:specifier];
+    NSDictionary *prefDefaults = [NSDictionary dictionaryWithContentsOfFile:[self.bundle pathForResource:@"prefsDefaults" ofType:@".plist"]];
     
-    NSString *key = specifier.properties[@"key"];
-    
-    if (key) {
+    for (NSString *key in prefDefaults) {
         
-        NSString *defaults = specifier.properties[@"defaults"];
-        
-        if (defaults) {
-            
-            //update the CFPreferences so we can read them right away
-            CFPreferencesSetAppValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)value, (__bridge CFStringRef)defaults);
-            CFPreferencesAppSynchronize((__bridge CFStringRef)defaults);
-            
-        }
+        CFPreferencesSetAppValue((__bridge CFStringRef)key,
+                                 (__bridge CFPropertyListRef)[prefDefaults valueForKey:key],
+                                 CFSTR("com.apple.Music"));
         
     }
-}
-
-- (void)viewTwitterProfile:(PSSpecifier *)specifier
-{
-    [SWPSTwitterCell performActionWithSpecifier:specifier];
+    
+    //syncronize so we can read right away
+    CFPreferencesAppSynchronize(CFSTR("com.apple.Music"));
+    
+    [self reloadSpecifiers];
 }
 
 @end

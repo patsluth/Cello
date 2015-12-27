@@ -10,19 +10,8 @@
 
 #import "MPMediaItemCollection+SW.h"
 
-#import "libsw/libSluthware/SWPrefs.h"
 
 
-
-//-Show in iTunes Store
-//-Start Radio Station
-//-Play Next
-//-Add to Up Next
-//-Add to Playlist
-//-Remove from Playlist
-//-Make Available Offline
-//-Remove Download
-//-Delete
 
 
 %hook MusicEntityValueContext
@@ -30,10 +19,6 @@
 %new
 - (BOOL)showInStoreAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_showinstore_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     if ([self isConcreteMediaItem]) {
         return YES;
     }
@@ -50,10 +35,6 @@
 %new
 - (BOOL)startRadioStationAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_startradiostation_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     if ([self isConcreteMediaItem]) {
         return YES;
     }
@@ -78,10 +59,6 @@
 %new
 - (BOOL)upNextAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_upnext_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     if ([self isConcreteMediaItem] || [self isConcreteMediaPlaylist]) {
         return YES;
     }
@@ -102,10 +79,6 @@
 %new
 - (BOOL)addToPlaylistAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_addtoplaylist_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     if ([self isConcreteMediaItem] || [self isConcreteMediaPlaylist]) {
         return YES;
     }
@@ -123,20 +96,12 @@
 %new
 - (BOOL)makeAvailableOfflineAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_makeavailableoffline_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     return YES;
 }
 
 %new
 - (BOOL)removeFromPlaylistAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_deleteremove_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     if ([self isConcreteMediaItem]) {
         
         if (self.containerEntityValueProvider && [(id)self.containerEntityValueProvider isKindOfClass:%c(MPConcreteMediaPlaylist)]) {
@@ -151,10 +116,6 @@
 %new
 - (BOOL)deleteAvailable
 {
-    if (![[SWPrefs valueForKey:@"cello_deleteremove_enabled" application:@"com.apple.Music"] boolValue]) {
-        return NO;
-    }
-    
     return YES;
 }
 
