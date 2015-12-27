@@ -40,6 +40,7 @@ typedef enum {
 @property (nonatomic, readonly) BOOL makeAvailableOffline_slide;
 @property (nonatomic, readonly) BOOL deleteRemove_slide;
 
+- (void)refreshPrefs;
 
 @end
 

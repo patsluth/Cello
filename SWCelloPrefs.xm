@@ -45,22 +45,32 @@
     
     if (self) {
         
-        self.popActionType = (SWCelloPrefs_ActionType)CFPreferencesGetAppIntegerValue(CFSTR("cello_popaction_type"), PREFS_APPLICATION, nil);
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(refreshPrefs)
+                                                     name:UIApplicationWillEnterForegroundNotification
+                                                   object:nil];
         
-        self.showInStore_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_showinstore_peek_enabled"), PREFS_APPLICATION, nil);
-        self.startRadioStation_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_startradiostation_peek_enabled"), PREFS_APPLICATION, nil);
-        self.upNext_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_upnext_peek_enabled"), PREFS_APPLICATION, nil);
-        self.addToPlaylist_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_addtoplaylist_peek_enabled"), PREFS_APPLICATION, nil);
-        self.makeAvailableOffline_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_makeavailableoffline_peek_enabled"), PREFS_APPLICATION, nil);
-        self.deleteRemove_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_deleteremove_peek_enabled"), PREFS_APPLICATION, nil);
-        
-        self.upNext_slide = CFPreferencesGetAppBooleanValue(CFSTR("cello_upnext_slide_enabled"), PREFS_APPLICATION, nil);
-        self.makeAvailableOffline_slide = CFPreferencesGetAppBooleanValue(CFSTR("cello_makeavailableoffline_slide_enabled"), PREFS_APPLICATION, nil);
-        self.deleteRemove_slide = CFPreferencesGetAppBooleanValue(CFSTR("cello_deleteremove_slide_enabled"), PREFS_APPLICATION, nil);
+        [self refreshPrefs];
         
     }
     
     return self;
+}
+
+- (void)refreshPrefs
+{
+    self.popActionType = (SWCelloPrefs_ActionType)CFPreferencesGetAppIntegerValue(CFSTR("cello_popaction_type"), PREFS_APPLICATION, nil);
+    
+    self.showInStore_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_showinstore_peek_enabled"), PREFS_APPLICATION, nil);
+    self.startRadioStation_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_startradiostation_peek_enabled"), PREFS_APPLICATION, nil);
+    self.upNext_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_upnext_peek_enabled"), PREFS_APPLICATION, nil);
+    self.addToPlaylist_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_addtoplaylist_peek_enabled"), PREFS_APPLICATION, nil);
+    self.makeAvailableOffline_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_makeavailableoffline_peek_enabled"), PREFS_APPLICATION, nil);
+    self.deleteRemove_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_deleteremove_peek_enabled"), PREFS_APPLICATION, nil);
+    
+    self.upNext_slide = CFPreferencesGetAppBooleanValue(CFSTR("cello_upnext_slide_enabled"), PREFS_APPLICATION, nil);
+    self.makeAvailableOffline_slide = CFPreferencesGetAppBooleanValue(CFSTR("cello_makeavailableoffline_slide_enabled"), PREFS_APPLICATION, nil);
+    self.deleteRemove_slide = CFPreferencesGetAppBooleanValue(CFSTR("cello_deleteremove_slide_enabled"), PREFS_APPLICATION, nil);
 }
 
 @end

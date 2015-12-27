@@ -90,31 +90,18 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    %orig(animated);
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(cello_refreshPrefs)
-                                                 name:UIApplicationWillEnterForegroundNotification
-                                               object:nil];
-    
     self.celloPrefs = [[SWCelloPrefs alloc] init];
+    
+    %orig(animated);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    %orig(animated);
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
     // remove our associated object
     self.celloPrefs = nil;
     self.celloCurrentPreviewingIndexPath = nil;
-}
-
-%new
-- (void)cello_refreshPrefs
-{
-    self.celloPrefs = [[SWCelloPrefs alloc] init];
+    
+    %orig(animated);
 }
 
 // peek
@@ -122,8 +109,6 @@
 {
     return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
 }
-
-static NSIndexPath *previewingIndexPath;
 
 %new
 - (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -358,6 +343,7 @@ static NSIndexPath *previewingIndexPath;
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    return YES;
     // if all options are disabled then don't allow sliding
     if (self.celloPrefs.upNext_slide || self.celloPrefs.makeAvailableOffline_slide || self.celloPrefs.deleteRemove_slide) {
         return YES;
@@ -394,7 +380,7 @@ static NSIndexPath *previewingIndexPath;
     }
     
     // not a media cell
-    return UITableViewCellEditingStyleNone;
+    return %orig(tableView, indexPath);
 }
 
 %new
@@ -402,8 +388,7 @@ static NSIndexPath *previewingIndexPath;
 {
     UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
-    
-    if (!cell) {
+        if (!cell) {
         return nil;
     }
     
@@ -484,6 +469,9 @@ static NSIndexPath *previewingIndexPath;
         
     }
     
+    if (actions.count == 0) {
+        return nil;
+    }
     
     return [actions copy];
 }
@@ -769,12 +757,23 @@ static NSIndexPath *previewingIndexPath;
 %new
 - (SWCelloPrefs *)celloPrefs
 {
-    return objc_getAssociatedObject(self, @selector(_celloPrefs));
+    SWCelloPrefs *prefs = objc_getAssociatedObject(self, @selector(_celloPrefs));
+    
+    if (!prefs) {
+        self.celloPrefs = [[SWCelloPrefs alloc] init];
+        return self.celloPrefs;
+    }
+    
+    return prefs;
 }
 
 %new
 - (void)setCelloPrefs:(SWCelloPrefs *)celloPrefs
 {
+    if (celloPrefs == nil && self.celloPrefs) { // clean up notifications
+        [[NSNotificationCenter defaultCenter] removeObserver:self.celloPrefs];
+    }
+    
     objc_setAssociatedObject(self, @selector(_celloPrefs), celloPrefs, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
