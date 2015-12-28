@@ -15,6 +15,18 @@
 %hook MusicContextualActionsHeaderViewController
 
 %new
+- (NSIndexPath *)celloPreviewIndexPath
+{
+    return objc_getAssociatedObject(self, @selector(_celloPreviewIndexPath));
+}
+
+%new
+- (void)setCelloPreviewIndexPath:(NSIndexPath *)celloPreviewIndexPath
+{
+    objc_setAssociatedObject(self, @selector(_celloPreviewIndexPath), celloPreviewIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+%new
 - (NSArray<id<UIPreviewActionItem>> *)celloPreviewActionItems
 {
     return objc_getAssociatedObject(self, @selector(_celloPreviewActionItems));

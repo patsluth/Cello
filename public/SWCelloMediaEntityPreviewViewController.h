@@ -13,6 +13,7 @@
 
 @required
 
+@property (strong, nonatomic) NSIndexPath *celloPreviewIndexPath;
 @property (strong, nonatomic) NSArray<id<UIPreviewActionItem>> *celloPreviewActionItems;
 
 @end

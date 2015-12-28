@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Pat Sluth. All rights reserved.
 //
 
+#import "SWCelloPrefs.h"
 #import "SWCelloMediaEntityPreviewViewController.h"
 
 #import "MusicLibraryBrowseTableViewController.h"
@@ -99,7 +100,6 @@
 {
     // remove our associated object
     self.celloPrefs = nil;
-    self.celloCurrentPreviewingIndexPath = nil;
     
     %orig(animated);
 }
@@ -118,16 +118,20 @@
     }
 
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
-    self.celloCurrentPreviewingIndexPath = indexPath;
     
     if (!indexPath) {
         return nil;
     }
     
     UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    
 
     if (cell) {
+        
+#ifdef DEBUG
+        
+        NSDate *methodStart = [NSDate date];
+        
+#endif
         
         __block MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
         NSMutableArray *actions = [@[] mutableCopy];
@@ -283,7 +287,23 @@
             
         }
         
+        previewViewController.celloPreviewIndexPath = indexPath;
         previewViewController.celloPreviewActionItems = [actions copy];
+        
+#ifdef DEBUG
+        
+        NSDate *methodFinish = [NSDate date];
+        NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+        
+        
+        NSLog(@"");NSLog(@"--------------------------------");
+        NSLog(@"%@", NSStringFromClass(self.class));
+        NSLog(@"%@", NSStringFromSelector(_cmd));
+        NSLog(@"executionTime:[%f]", executionTime);
+        NSLog(@"--------------------------------");
+        
+#endif
+        
         return previewViewController;
     }
 
@@ -298,18 +318,22 @@
 %new
 - (void)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
 {
+    UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController;
+    previewViewController = (UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit;
+    
+    
     if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_PushViewController) {
     
-        if ([viewControllerToCommit isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) {
+        if ([previewViewController isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) {
             
             // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
             // This will simulate clicking the contextual action header view, opening the view controller for the collection
-            MusicContextualActionsHeaderViewController *headerVC = (MusicContextualActionsHeaderViewController *)viewControllerToCommit;
+            MusicContextualActionsHeaderViewController *headerVC = (MusicContextualActionsHeaderViewController *)previewViewController;
             [self.libraryViewConfiguration handleSelectionOfEntityValueContext:headerVC.entityValueContext fromViewController:nil];
             
         } else {
             
-            [self showViewController:viewControllerToCommit sender:nil];
+            [self showViewController:previewViewController sender:nil];
             
         }
         
@@ -318,28 +342,26 @@
         //MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:self.celloCurrentPreviewingIndexPath];
         
         if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_ShowInStore) {
-            [self cello_performShowInStoreActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+            [self cello_performShowInStoreActionForIndexPath:previewViewController.celloPreviewIndexPath];
         } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_StartRadioStation) {
-            [self cello_performStartStationActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+            [self cello_performStartStationActionForIndexPath:previewViewController.celloPreviewIndexPath];
         } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_PlayNext) {
-            [self cello_performUpNextAction:UpNextAlertAction_PlayNext forIndexPath:self.celloCurrentPreviewingIndexPath];
+            [self cello_performUpNextAction:UpNextAlertAction_PlayNext forIndexPath:previewViewController.celloPreviewIndexPath];
         } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_AddToUpNext) {
-            [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forIndexPath:self.celloCurrentPreviewingIndexPath];
+            [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forIndexPath:previewViewController.celloPreviewIndexPath];
         } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_AddToPlaylist) {
-            [self cello_performAddToPlaylistActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+            [self cello_performAddToPlaylistActionForIndexPath:previewViewController.celloPreviewIndexPath];
         } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_ToggleKeepLocal) {
-            [self cello_performDownloadActionForIndexPath:self.celloCurrentPreviewingIndexPath];
+            [self cello_performDownloadActionForIndexPath:previewViewController.celloPreviewIndexPath];
         } else if (self.celloPrefs.popActionType == SWCelloPrefs_ActionType_Delete) {
-            UIAlertController *deleteConfirmController = [self cello_deleteConfirmationAlertController:self.celloCurrentPreviewingIndexPath];
+            UIAlertController *deleteConfirmController = [self cello_deleteConfirmationAlertController:previewViewController.celloPreviewIndexPath];
             [self presentViewController:deleteConfirmController animated:YES completion:nil];
         }
         
     }
-    
-    self.celloCurrentPreviewingIndexPath = nil;
 }
 
-#pragma mark - UITableViewEditing
+#pragma mark - UITableView
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -505,8 +527,8 @@
         previewViewController = [[%c(MusicMediaAlbumDetailViewController) alloc] initWithContainerEntityProvider:albumProvider
                                                                                          tracklistEntityProvider:titlesProvider
                                                                                                    clientContext:self.clientContext
-                                                                           existingJSProductNativeViewController:nil];
-        
+                                                                           existingJSProductNativeViewController:nil
+                                                                                              forContentCreation:YES];
         
     } else if ([valueContext isConcreteMediaCollection]) { // media collection (genre, compilation, etc)
         
@@ -777,22 +799,7 @@
     objc_setAssociatedObject(self, @selector(_celloPrefs), celloPrefs, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-%new
-- (NSIndexPath *)celloCurrentPreviewingIndexPath
-{
-    return objc_getAssociatedObject(self, @selector(_celloCurrentPreviewingIndexPath));
-}
-
-%new
-- (void)setCelloCurrentPreviewingIndexPath:(NSIndexPath *)celloCurrentPreviewingIndexPath
-{
-    objc_setAssociatedObject(self, @selector(_celloCurrentPreviewingIndexPath), celloCurrentPreviewingIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 %end
-
-
-
 
 
 
@@ -966,6 +973,8 @@
 //}
 //
 //%end
+
+
 
 
 

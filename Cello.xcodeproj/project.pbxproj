@@ -15,6 +15,7 @@
 		2EBB75821BE97C5A00A3A82D /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		2EBB758B1BE97C5A00A3A82D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryBrowseTableViewController.xm; sourceTree = "<group>"; };
+		2EC644381C319EB80014A675 /* SWCelloDebug.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloDebug.xm; sourceTree = "<group>"; };
 		2EE8EDC21C2E13AD0092DD14 /* MusicEntityValueContext.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicEntityValueContext.xm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -30,6 +31,7 @@
 				2EE8EDC21C2E13AD0092DD14 /* MusicEntityValueContext.xm */,
 				2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */,
 				2EB72E8E1C2C427A0016825A /* MusicMediaDetailViewController.xm */,
+				2EC644381C319EB80014A675 /* SWCelloDebug.xm */,
 				2E6F41451C304DE900B9361F /* SWCelloPrefs.xm */,
 			);
 			sourceTree = "<group>";

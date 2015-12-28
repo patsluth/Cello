@@ -22,7 +22,6 @@ typedef enum {
 @property (strong, nonatomic) /*MusicClientContext*/ id clientContext;
 @property (strong, nonatomic) /*MusicTableView*/ UITableView *tableView;
 @property (strong, nonatomic) SWCelloPrefs *celloPrefs;
-@property (strong, nonatomic) NSIndexPath *celloCurrentPreviewingIndexPath;
 
 - (id)initWithLibraryViewConfiguration:(MusicLibraryViewConfiguration *)arg1;
 

@@ -3,9 +3,9 @@
 
 
 
-FINALPACKAGE = 1
-DEBUG = 0
-PACKAGE_VERSION = 1.0-1
+FINALPACKAGE = 0
+DEBUG = 1
+PACKAGE_VERSION = 1.0-2
 
 
 
@@ -21,6 +21,10 @@ TARGET = iphone:clang:latest:7.0
 TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
 SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicEntityValueContext.xm MusicContextualActionsHeaderViewController.xm MusicLibraryBrowseTableViewController.xm MusicMediaDetailViewController.xm SWCelloPrefs.xm
+ifeq ($(DEBUG), 1)
+    SWCello_FILES += SWCelloDebug.xm
+endif
+
 SWCello_FRAMEWORKS = Foundation UIKit MediaPlayer
 SWCello_LIBRARIES = substrate sw packageinfo
 
