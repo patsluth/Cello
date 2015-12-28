@@ -1,6 +1,6 @@
 Package: com.patsluth.cello
 Name: Cello
-Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw (>= 1.0-17)
+Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw (>= 1.0-18)
 Architecture: iphoneos-arm
 Description: Quick access to media contextual actions via 3D Touch and Tableview Cell sliding in the Music app.
 Maintainer: Pat Sluth
