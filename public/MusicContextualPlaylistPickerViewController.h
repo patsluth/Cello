@@ -16,8 +16,8 @@
 + (BOOL)automaticallyInstallAccountBarButtonItem;
 + (BOOL)automaticallyInstallSearchBarButtonItem;
 
--(void)_dismissPlaylistPicker;
--(void)playlistPickerDidFinishWithSelectedPlaylist:(id)arg1;
+- (void)_dismissPlaylistPicker;
+- (void)playlistPickerDidFinishWithSelectedPlaylist:(id)arg1;
 
 @end
 

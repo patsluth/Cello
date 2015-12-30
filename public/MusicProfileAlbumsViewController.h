@@ -9,8 +9,6 @@
 {
 }
 
-- (id)initWithLibraryViewConfiguration:(id)arg1;
-
 @end
 
 

@@ -1,32 +1,29 @@
 
 #import "SWCelloMediaEntityPreviewViewController.h"
-#import "MusicLibraryViewConfiguration.h"
+#import "MusicLibraryBrowseCollectionViewConfiguration.h"
+//TODO: CONSOLIDATE (THIS IS FOR UPNEXTACTIONTYPE)
+#import "MusicLibraryBrowseTableViewController.h"
 
 @class SWCelloPrefs;
 @class MusicEntityValueContext;
 
-typedef enum {
-    UpNextAlertAction_PlayNext = 0,
-    UpNextAlertAction_AddToUpNext = 1
-} UpNextAlertAction_Type;
 
 
 
 
-
-@interface MusicLibraryBrowseTableViewController : UITableViewController <UIViewControllerPreviewingDelegate>
+@interface MusicLibraryBrowseCollectionViewController : UICollectionViewController <UIViewControllerPreviewingDelegate>
 {
 }
 
-@property (nonatomic,readonly) MusicLibraryViewConfiguration *libraryViewConfiguration;
+@property (nonatomic,readonly) MusicLibraryBrowseCollectionViewConfiguration *libraryViewConfiguration;
 
-@property (strong, nonatomic) /*MusicClientContext*/ id clientContext;
-@property (strong, nonatomic) /*MusicTableView*/ UITableView *tableView;
+@property (nonatomic,retain) /*SKUIClientContext **/ id clientContext;
+@property (nonatomic,readonly) UICollectionViewFlowLayout *collectionViewFlowLayout;
 @property (strong, nonatomic) SWCelloPrefs *celloPrefs;
 
 - (id)_entityValueContextAtIndexPath:(id)arg1;
+- (id)_sectionEntityValueContextForIndex:(unsigned long long)arg1;
 - (void)_configureEntityValueContextOutput:(id)arg1 forIndexPath:(id)arg2;
-
 
 - (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext
                     viewControllerForLocation:(CGPoint)location;
@@ -50,5 +47,7 @@ typedef enum {
 - (UIAlertController *)cello_deleteConfirmationAlertController:(NSIndexPath *)indexPath;
 
 @end
+
+
 
 

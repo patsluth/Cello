@@ -1,5 +1,5 @@
 //
-//  MusicLibraryBrowseTableViewController.xm
+//  MusicLibraryBrowseCollectionViewController.xm
 //  Cello
 //
 //  Created by Pat Sluth on 2015-12-21.
@@ -8,6 +8,13 @@
 
 #import "SWCelloPrefs.h"
 #import "SWCelloMediaEntityPreviewViewController.h"
+
+#import "SWCelloPrefs.h"
+#import "SWCelloMediaEntityPreviewViewController.h"
+
+#import "MusicLibraryBrowseCollectionViewController.h"
+#import "MusicLibraryBrowseHeterogenousCollectionViewController.h"
+#import "MusicLibrarySearchResultsViewController.h"
 
 #import "MusicLibraryBrowseTableViewController.h"
 #import "MusicMediaAlbumDetailViewController.h"
@@ -42,7 +49,7 @@
 
 
 
-@protocol Cello_MusicEntityTableViewCellValueProviding
+@protocol Cello_MusicEntityCollectionViewCellValueProviding
 @required
 @property (nonatomic,retain) id<MusicEntityValueProviding> entityValueProvider;
 @end
@@ -51,7 +58,7 @@
 
 
 
-%hook MusicProfileAlbumsViewController
+%hook MusicLibrarySearchResultsViewController
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -67,7 +74,7 @@
 
 %end
 
-%hook MusicProductTracklistTableViewController
+%hook MusicLibraryBrowseHeterogenousCollectionViewController
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -83,7 +90,7 @@
 
 %end
 
-%hook MusicLibraryBrowseTableViewController
+%hook MusicLibraryBrowseCollectionViewController
 
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -113,14 +120,14 @@
         return nil;
     }
     
-    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
+    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     
     if (!indexPath) {
         return nil;
     }
     
-    UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    cell = (UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *)[self.tableView cellForRowAtIndexPath:indexPath];
+    UICollectionViewCell<Cello_MusicEntityCollectionViewCellValueProviding> *cell;
+    cell = (UICollectionViewCell<Cello_MusicEntityCollectionViewCellValueProviding> *)[self.collectionView cellForItemAtIndexPath:indexPath];
     
     if (cell) {
         
@@ -132,7 +139,6 @@
         
         __block MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
         NSMutableArray *actions = [@[] mutableCopy];
-        
         
         if (self.celloPrefs.showInStore_peek && [valueContext showInStoreAvailable]) {
             
@@ -271,7 +277,6 @@
             previewViewController = [self cello_previewViewControllerForEntityValueContext:valueContext];
         }
         
-        
         // Cut these views down to size to only show the header in the preview
         if ([previewViewController isKindOfClass:%c(MusicMediaDetailViewController)]) {
             
@@ -358,151 +363,12 @@
     }
 }
 
-#pragma mark - UITableView
-
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // if all options are disabled then don't allow sliding
-    if (self.celloPrefs.upNext_slide || self.celloPrefs.makeAvailableOffline_slide || self.celloPrefs.deleteRemove_slide) {
-        return YES;
-    } else {
-        return %orig(tableView, indexPath);
-    }
-}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-}
-
-- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // if all options are disabled then don't allow sliding
-    if (self.celloPrefs.upNext_slide || self.celloPrefs.makeAvailableOffline_slide || self.celloPrefs.deleteRemove_slide) {
-        
-        UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-        cell = (UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *)[self.tableView cellForRowAtIndexPath:indexPath];
-        
-        if ([(id)cell.entityValueProvider isKindOfClass:%c(MusicCoalescingEntityValueProvider)]) {
-            
-            
-            // contains cached media properties
-            MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
-            coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
-            
-            if ([[(id)coalescingEntityValueProvider.baseEntityValueProvider class] isSubclassOfClass:%c(MPMediaEntity)]) { // media cell
-                
-                return UITableViewCellEditingStyleDelete;
-                
-            }
-        }
-        
-    }
-    
-    // not a media cell
-    return %orig(tableView, indexPath);
-}
-
-%new
-- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    cell = (UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *)[self.tableView cellForRowAtIndexPath:indexPath];
-    
-    if (!cell) {
-        return nil;
-    }
-    
-    MusicEntityValueContext *valueContext = [self cello_entityValueContextAtIndexPath:indexPath];
-    NSMutableArray *actions = [@[] mutableCopy];
-    
-    
-    if (self.celloPrefs.upNext_slide && [valueContext upNextAvailable]) {
-        
-        UITableViewRowAction *playNextAction = [UITableViewRowAction
-                                                rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                title:@"Play\nNext"
-                                                handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                    
-                                                    [self cello_performUpNextAction:UpNextAlertAction_PlayNext forIndexPath:indexPath];
-                                                    [self.tableView setEditing:NO animated:YES];
-                                                    
-                                                }];
-        playNextAction.backgroundColor = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
-        [actions addObject:playNextAction];
-        
-        
-        UITableViewRowAction *addToUpNextAction = [UITableViewRowAction
-                                                   rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                   title:@"Up\nNext"
-                                                   handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                       
-                                                       [self cello_performUpNextAction:UpNextAlertAction_AddToUpNext forIndexPath:indexPath];
-                                                       [self.tableView setEditing:NO animated:YES];
-                                                       
-                                                   }];
-        addToUpNextAction.backgroundColor = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
-        [actions addObject:addToUpNextAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.makeAvailableOffline_slide && [valueContext makeAvailableOfflineAvailable]) {
-        
-        // contains cached media properties
-        MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
-        coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
-        
-        // so we know if the item is already downloaded or not
-        NSNumber *keepLocal = [coalescingEntityValueProvider valueForEntityProperty:@"keepLocal"];
-        UITableViewRowAction *downloadAction = [UITableViewRowAction
-                                                rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                title:(keepLocal.boolValue ? @"Remove\nDownload" : @"Download")
-                                                handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                    
-                                                    [CATransaction begin];
-                                                    [CATransaction setCompletionBlock: ^{
-                                                        [self cello_performDownloadActionForIndexPath:indexPath];
-                                                    }];
-                                                    [self.tableView setEditing:NO animated:YES];
-                                                    [CATransaction commit];
-                                                    
-                                                    
-                                                }];
-        downloadAction.backgroundColor = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
-        [actions addObject:downloadAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.deleteRemove_slide && [valueContext deleteAvailable]) {
-        
-        UITableViewRowAction *deleteAction = [UITableViewRowAction
-                                              rowActionWithStyle:UITableViewRowActionStyleDestructive
-                                              title:@"Delete"
-                                              handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                  
-                                                  UIAlertController *deleteConfirmController = [self cello_deleteConfirmationAlertController:indexPath];
-                                                  [self presentViewController:deleteConfirmController animated:YES completion:nil];
-                                                  
-                                              }];
-        [actions addObject:deleteAction];
-        
-    }
-    
-    if (actions.count == 0) {
-        return nil;
-    }
-    
-    return [actions copy];
-}
-
 #pragma mark - Cello Additions
 
 %new
 - (UIViewController<SWCelloMediaEntityPreviewViewController> *)cello_previewViewControllerForEntityValueContext:(MusicEntityValueContext *)valueContext
 {
     UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController = nil;
-    
     
     if ([valueContext isConcreteMediaItem]) { // song
         
@@ -672,8 +538,8 @@
 %new
 - (UIAlertController *)cello_deleteConfirmationAlertController:(NSIndexPath *)indexPath
 {
-    UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *cell;
-    cell = (UITableViewCell<Cello_MusicEntityTableViewCellValueProviding> *)[self.tableView cellForRowAtIndexPath:indexPath];
+    UICollectionViewCell<Cello_MusicEntityCollectionViewCellValueProviding> *cell;
+    cell = (UICollectionViewCell<Cello_MusicEntityCollectionViewCellValueProviding> *)[self.collectionView cellForItemAtIndexPath:indexPath];
     MusicCoalescingEntityValueProvider *coalescingEntityValueProvider;
     coalescingEntityValueProvider = (MusicCoalescingEntityValueProvider *)cell.entityValueProvider;
     
@@ -688,7 +554,7 @@
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction * action) {
                                                              
-                                                             [self.tableView setEditing:NO animated:YES];
+                                                             //[self.collectionView setEditing:NO animated:YES];
                                                              
                                                          }];
     [controller addAction:cancelAction];

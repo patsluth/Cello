@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		2E0CB1661C34504E0059D1CF /* SWCelloTest.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloTest.xm; sourceTree = "<group>"; };
+		2E0CB1671C34639A0059D1CF /* MusicLibraryBrowseCollectionViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryBrowseCollectionViewController.xm; sourceTree = "<group>"; };
 		2E6F41451C304DE900B9361F /* SWCelloPrefs.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloPrefs.xm; sourceTree = "<group>"; };
 		2E7C5E391C2B23A000AAC247 /* MusicContextualActionsHeaderViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicContextualActionsHeaderViewController.xm; sourceTree = "<group>"; };
 		2E7C5E3A1C2B2C4100AAC247 /* MusicCoalescingEntityValueProvider.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicCoalescingEntityValueProvider.xm; sourceTree = "<group>"; };
@@ -29,10 +31,12 @@
 				2E7C5E3A1C2B2C4100AAC247 /* MusicCoalescingEntityValueProvider.xm */,
 				2E7C5E391C2B23A000AAC247 /* MusicContextualActionsHeaderViewController.xm */,
 				2EE8EDC21C2E13AD0092DD14 /* MusicEntityValueContext.xm */,
+				2E0CB1671C34639A0059D1CF /* MusicLibraryBrowseCollectionViewController.xm */,
 				2EBB75921BE97C5A00A3A82D /* MusicLibraryBrowseTableViewController.xm */,
 				2EB72E8E1C2C427A0016825A /* MusicMediaDetailViewController.xm */,
 				2EC644381C319EB80014A675 /* SWCelloDebug.xm */,
 				2E6F41451C304DE900B9361F /* SWCelloPrefs.xm */,
+				2E0CB1661C34504E0059D1CF /* SWCelloTest.xm */,
 			);
 			sourceTree = "<group>";
 		};

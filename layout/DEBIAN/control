@@ -1,4 +1,4 @@
-Package: com.patsluth.cello
+Package: org.thebigboss.cello
 Name: Cello
 Depends: firmware (>= 9.0.2), mobilesubstrate, com.patsluth.libsw (>= 1.0-18)
 Architecture: iphoneos-arm

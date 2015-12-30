@@ -11,7 +11,7 @@
 {
 }
 
--(id)initWithContainerEntityProvider:(MusicMediaEntityProvider *)arg1
+- (id)initWithContainerEntityProvider:(MusicMediaEntityProvider *)arg1
              tracklistEntityProvider:(MusicMediaEntityProvider *)arg2
                        clientContext:(/*MusicClientContext **/ id)arg3
 existingJSProductNativeViewController:(id)arg4;
