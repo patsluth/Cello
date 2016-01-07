@@ -1,5 +1,5 @@
 
-@protocol MusicEntityValueProviding //<IKEntityValueProviding>
+@protocol MusicEntityValueProviding <NSObject>//<IKEntityValueProviding>
 
 @required
 

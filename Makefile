@@ -5,13 +5,18 @@
 
 FINALPACKAGE = 1
 DEBUG = 0
-PACKAGE_VERSION = 1.0-2
+PACKAGE_VERSION = 1.0-3
 
 
 
 
 
-ARCHS = armv7 armv7s arm64
+
+ifeq ($(DEBUG), 1)
+    ARCHS = arm64
+else
+    ARCHS = armv7 armv7s arm64
+endif
 TARGET = iphone:clang:latest:7.0
 
 
@@ -20,13 +25,13 @@ TARGET = iphone:clang:latest:7.0
 
 TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
-SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicEntityValueContext.xm MusicContextualActionsHeaderViewController.xm MusicLibraryBrowseCollectionViewController.xm MusicLibraryBrowseTableViewController.xm MusicMediaDetailViewController.xm SWCelloPrefs.xm
+SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicContextualActionsHeaderViewController.xm MusicEntityValueContext.xm MusicLibraryBrowseCollectionViewController.xm MusicLibraryBrowseTableViewController.xm MusicLibraryComposersViewConfiguration.xm MusicLibraryGenresViewConfiguration.xm MusicLibrarySongsViewConfiguration.xm MusicLibraryViewConfiguration.xm MusicMediaDetailViewController.xm SWCelloDataSource.xm SWCelloPrefs.xm
 ifeq ($(DEBUG), 1)
-    SWCello_FILES += #SWCelloDebug.xm SWCelloTest.xm
+    SWCello_FILES += SWCelloTest.xm #SWCelloDebug.xm
 endif
 
 SWCello_FRAMEWORKS = Foundation UIKit MediaPlayer
-SWCello_LIBRARIES = substrate sw packageinfo
+SWCello_LIBRARIES = substrate sw packageinfo MobileGestalt
 
 ADDITIONAL_CFLAGS = -Ipublic
 

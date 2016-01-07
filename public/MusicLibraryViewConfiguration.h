@@ -1,10 +1,22 @@
 
+#import "MusicClientContextConsuming.h"
+
+@class MusicEntityValueContext;
+
+
+
+
+
 @interface MusicLibraryViewConfiguration : NSObject
 {
 }
 
-- (id)previewViewControllerForEntityValueContext:(id)arg1 fromViewController:(id)arg2;
-- (long long)handleSelectionOfEntityValueContext:(id)arg1 fromViewController:(id)arg2;
+- (BOOL)canPreviewEntityValueContext:(id)arg1;
+
+- (id)previewViewControllerForEntityValueContext:(MusicEntityValueContext *)valueContext
+                              fromViewController:(id<MusicClientContextConsuming>)viewController;
+- (long long)handleSelectionOfEntityValueContext:(MusicEntityValueContext *)valueContext
+                              fromViewController:(id<MusicClientContextConsuming>)viewController;
 
 @end
 

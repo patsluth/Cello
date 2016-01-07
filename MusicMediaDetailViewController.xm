@@ -38,7 +38,7 @@
     objc_setAssociatedObject(self, @selector(_celloPreviewActionItems), celloPreviewActionItems, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)viewWillDisappear:(BOOL)animated
+- (void)viewDidDisappear:(BOOL)animated
 {
     %orig(animated);
     

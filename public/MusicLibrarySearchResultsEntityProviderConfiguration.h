@@ -9,6 +9,8 @@
 {
 }
 
++ (NSArray *)_defaultLibraryViewConfigurations;
+
 @end
 
 

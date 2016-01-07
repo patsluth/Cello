@@ -31,18 +31,20 @@
 
 - (void)resetOutputValues;
 
-// Cello additions
-- (BOOL)showInStoreAvailable;
-- (BOOL)startRadioStationAvailable;
-- (BOOL)upNextAvailable;
-- (BOOL)addToPlaylistAvailable;
-- (BOOL)makeAvailableOfflineAvailable;
-- (BOOL)removeFromPlaylistAvailable;
-- (BOOL)deleteAvailable;
 
-- (/*MPMediaConcreteItem **/ id)isConcreteMediaItem;
-- (/*MPConcreteMediaItemCollection **/ id)isConcreteMediaCollection;
-- (/*MPConcreteMediaPlaylist **/ id)isConcreteMediaPlaylist;
+- (BOOL)cello_showInStoreAvailable;
+- (BOOL)cello_startRadioStationAvailable;
+- (BOOL)cello_upNextAvailable;
+- (BOOL)cello_addToPlaylistAvailable;
+- (BOOL)cello_makeAvailableOfflineAvailable;
+- (BOOL)cello_removeFromPlaylistAvailable;
+- (BOOL)cello_deleteAvailable;
+
+- (/*MPMediaConcreteItem **/ id)cello_isConcreteMediaItem;
+- (/*MPConcreteMediaItemCollection **/ id)cello_isConcreteMediaCollection;
+- (/*MPConcreteMediaPlaylist **/ id)cello_isConcreteMediaPlaylist;
+
+- (Class)cello_correctLibraryViewConfiguration;
 
 - (void)log;
 

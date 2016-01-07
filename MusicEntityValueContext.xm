@@ -17,13 +17,13 @@
 %hook MusicEntityValueContext
 
 %new
-- (BOOL)showInStoreAvailable
+- (BOOL)cello_showInStoreAvailable
 {
-    if ([self isConcreteMediaItem]) {
+    if ([self cello_isConcreteMediaItem]) {
         return YES;
     }
     
-    MPMediaItemCollection *mediaCollection = (MPMediaItemCollection *)[self isConcreteMediaCollection];
+    MPMediaItemCollection *mediaCollection = (MPMediaItemCollection *)[self cello_isConcreteMediaCollection];
     
     if (mediaCollection && mediaCollection.groupingType == MPMediaGroupingAlbum) {
         return YES;
@@ -33,13 +33,13 @@
 }
 
 %new
-- (BOOL)startRadioStationAvailable
+- (BOOL)cello_startRadioStationAvailable
 {
-    if ([self isConcreteMediaItem]) {
+    if ([self cello_isConcreteMediaItem]) {
         return YES;
     }
     
-    if ([self isConcreteMediaCollection]) {
+    if ([self cello_isConcreteMediaCollection]) {
         
         MPMediaItemCollection *mediaCollection = (MPMediaItemCollection *)self.entityValueProvider;
         
@@ -57,13 +57,13 @@
 }
 
 %new
-- (BOOL)upNextAvailable
+- (BOOL)cello_upNextAvailable
 {
-    if ([self isConcreteMediaItem] || [self isConcreteMediaPlaylist]) {
+    if ([self cello_isConcreteMediaItem] || [self cello_isConcreteMediaPlaylist]) {
         return YES;
     }
     
-    if ([self isConcreteMediaCollection]) {
+    if ([self cello_isConcreteMediaCollection]) {
         
         MPMediaItemCollection *mediaCollection = (MPMediaItemCollection *)self.entityValueProvider;
         
@@ -77,13 +77,13 @@
 }
 
 %new
-- (BOOL)addToPlaylistAvailable
+- (BOOL)cello_addToPlaylistAvailable
 {
-    if ([self isConcreteMediaItem] || [self isConcreteMediaPlaylist]) {
+    if ([self cello_isConcreteMediaItem] || [self cello_isConcreteMediaPlaylist]) {
         return YES;
     }
     
-    MPMediaItemCollection *mediaCollection = (MPMediaItemCollection *)[self isConcreteMediaCollection];
+    MPMediaItemCollection *mediaCollection = (MPMediaItemCollection *)[self cello_isConcreteMediaCollection];
     
     if (mediaCollection && (mediaCollection.groupingType == MPMediaGroupingAlbum ||
                             mediaCollection.groupingType == 17)) {
@@ -94,15 +94,15 @@
 }
 
 %new
-- (BOOL)makeAvailableOfflineAvailable
+- (BOOL)cello_makeAvailableOfflineAvailable
 {
     return YES;
 }
 
 %new
-- (BOOL)removeFromPlaylistAvailable
+- (BOOL)cello_removeFromPlaylistAvailable
 {
-    if ([self isConcreteMediaItem]) {
+    if ([self cello_isConcreteMediaItem]) {
         
         if (self.containerEntityValueProvider && [(id)self.containerEntityValueProvider isKindOfClass:%c(MPConcreteMediaPlaylist)]) {
             return YES;
@@ -114,7 +114,7 @@
 }
 
 %new
-- (BOOL)deleteAvailable
+- (BOOL)cello_deleteAvailable
 {
     return YES;
 }
@@ -123,7 +123,7 @@
 
 // return MPMediaConcreteItem if this value context is pointing to an individual item (not a collection)
 %new
-- (/*MPMediaConcreteItem **/ id)isConcreteMediaItem
+- (/*MPMediaConcreteItem **/ id)cello_isConcreteMediaItem
 {
     if (self.entityValueProvider && [(id)self.entityValueProvider isKindOfClass:%c(MPConcreteMediaItem)]) {
         return self.entityValueProvider;
@@ -134,7 +134,7 @@
 
 // return MPConcreteMediaItemCollection if this value context is pointing to an individual item (not a collection)
 %new
-- (/*MPConcreteMediaItemCollection **/ id)isConcreteMediaCollection
+- (/*MPConcreteMediaItemCollection **/ id)cello_isConcreteMediaCollection
 {
     if (self.entityValueProvider && [(id)self.entityValueProvider isKindOfClass:%c(MPConcreteMediaItemCollection)]) {
         return self.entityValueProvider;
@@ -145,10 +145,64 @@
 
 // return MPConcreteMediaPlaylist if this value context is pointing to a playlist
 %new
-- (/*MPConcreteMediaPlaylist **/ id)isConcreteMediaPlaylist
+- (/*MPConcreteMediaPlaylist **/ id)cello_isConcreteMediaPlaylist
 {
     if (self.entityValueProvider && [(id)self.entityValueProvider isKindOfClass:%c(MPConcreteMediaPlaylist)]) {
         return self.entityValueProvider;
+    }
+    
+    return nil;
+}
+
+%new
+- (Class)cello_correctLibraryViewConfiguration
+{
+    if ([self cello_isConcreteMediaItem]) { // song
+        
+        return %c(MusicLibrarySongsViewConfiguration);
+        
+    } else if ([self cello_isConcreteMediaCollection]) { // media collection (genre, compilation, etc)
+        
+        id albumArtistName = [self.entityValueProvider valueForEntityProperty:@"albumArtistName"];
+        id albumName = [self.entityValueProvider valueForEntityProperty:@"albumName"];
+        id title = [self.entityValueProvider valueForEntityProperty:@"title"];
+        id albumAlbumArtist = [self.entityValueProvider valueForEntityProperty:@"albumAlbumArtist"];
+        id albumCount = [self.entityValueProvider valueForEntityProperty:@"albumCount"];
+        id itemCount = [self.entityValueProvider valueForEntityProperty:@"itemCount"];
+        id genreName = [self.entityValueProvider valueForEntityProperty:@"genreName"];
+        id composerName = [self.entityValueProvider valueForEntityProperty:@"composerName"];
+        BOOL musicAlbumIsCompilation = false;
+        if ([self.entityValueProvider valueForEntityProperty:@"musicAlbumIsCompilation"]) {
+            musicAlbumIsCompilation = [[self.entityValueProvider valueForEntityProperty:@"musicAlbumIsCompilation"] boolValue];
+        }
+        
+        
+        BOOL isArtist = (albumArtistName && !albumName && !title);
+        if (isArtist) {
+            return %c(MusicLibraryArtistsViewConfiguration);
+        }
+        BOOL isAlbum = (albumName != nil);// && albumAlbumArtist && !musicAlbumIsCompilation);
+        if (isAlbum) {
+            return %c(MusicLibraryAlbumsViewConfiguration);
+        }
+        BOOL isGenre = (albumCount && genreName && itemCount);
+        if (isGenre) {
+            return %c(MusicLibraryGenresViewConfiguration);
+        }
+        BOOL isComposer = (albumCount && itemCount && composerName);
+        if (isComposer) {
+            return %c(MusicLibraryComposersViewConfiguration);
+        }
+        BOOL isCompilation = (albumName && albumAlbumArtist && musicAlbumIsCompilation);
+        if (isCompilation) {
+            return %c(MusicLibraryCompilationsViewConfiguration);
+        }
+        
+        
+    } else if ([self cello_isConcreteMediaPlaylist]) { // playlist
+        
+        return %c(MusicLibraryPlaylistsViewConfiguration);
+        
     }
     
     return nil;

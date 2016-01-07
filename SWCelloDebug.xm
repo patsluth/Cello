@@ -9,6 +9,7 @@
 #import "MusicMediaEntityProvider.h"
 #import "MusicEntityValueContext.h"
 
+// TODO: MOVE TO libsluthware
 #define LOG_METHOD_START NSLog(@"");NSLog(@"");NSLog(@"****************************************************************"); \
                          NSLog(@"[%@]", NSStringFromClass([((id)self) class])); \
                          NSLog(@"%@]", NSStringFromSelector(_cmd)); \

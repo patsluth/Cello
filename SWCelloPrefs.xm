@@ -18,7 +18,7 @@
 {
 }
 
-@property (nonatomic, readwrite) SWCelloPrefs_ActionType popActionType;
+@property (nonatomic, readwrite) SWCello_ActionType popActionType;
 
 @property (nonatomic, readwrite) BOOL showInStore_peek;
 @property (nonatomic, readwrite) BOOL startRadioStation_peek;
@@ -44,14 +44,7 @@
     self = [super init];
     
     if (self) {
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(refreshPrefs)
-                                                     name:UIApplicationWillEnterForegroundNotification
-                                                   object:nil];
-        
         [self refreshPrefs];
-        
     }
     
     return self;
@@ -59,7 +52,7 @@
 
 - (void)refreshPrefs
 {
-    self.popActionType = (SWCelloPrefs_ActionType)CFPreferencesGetAppIntegerValue(CFSTR("cello_popaction_type"), PREFS_APPLICATION, nil);
+    self.popActionType = (SWCello_ActionType)CFPreferencesGetAppIntegerValue(CFSTR("cello_popaction_type"), PREFS_APPLICATION, nil);
     
     self.showInStore_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_showinstore_peek_enabled"), PREFS_APPLICATION, nil);
     self.startRadioStation_peek = CFPreferencesGetAppBooleanValue(CFSTR("cello_startradiostation_peek_enabled"), PREFS_APPLICATION, nil);

@@ -41,6 +41,7 @@
 
 - (id)valueForEntityProperty:(NSString *)arg1
 {
+    // hide contextual button
     if ([arg1 isEqualToString:@"musicWantsContextualActionsButton"]) {
         return @(NO);
     }

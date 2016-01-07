@@ -1,12 +1,13 @@
 
-@protocol MusicEntityValueProviding;
+#import "MusicEntityValueProviding.h"
+
 @class MusicEntityViewContentDescriptor;
 
 
 
 
 
-@interface MusicCoalescingEntityValueProvider : NSObject
+@interface MusicCoalescingEntityValueProvider : NSObject <MusicEntityValueProviding>
 {
 }
 
@@ -14,9 +15,8 @@
 @property (nonatomic, retain) MusicEntityViewContentDescriptor *contentDescriptor;
 
 - (NSDictionary *)_cachedPropertyValues;
-- (id)valueForEntityProperty:(NSString *)arg1;
+- (id)imageURLForEntityArtworkProperty:(id)arg1 fittingSize:(CGSize)arg2 destinationScale:(double)arg3;
 
-// new
 - (NSString *)cello_EntityNameBestGuess;
 
 @end
