@@ -216,7 +216,8 @@
                                                 title:@"Play\nNext"
                                                 handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
                                                     
-                                                    [self.celloDataSource performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
+                                                    [self.celloDataSource performUpNextAction:SWCello_UpNextActionType_PlayNext
+                                                                                 forIndexPath:indexPath];
                                                     [self.tableView setEditing:NO animated:YES];
                                                     
                                                 }];
@@ -229,7 +230,8 @@
                                                    title:@"Up\nNext"
                                                    handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
                                                        
-                                                       [self.celloDataSource performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
+                                                       [self.celloDataSource performUpNextAction:SWCello_UpNextActionType_AddToUpNext
+                                                                                    forIndexPath:indexPath];
                                                        [self.tableView setEditing:NO animated:YES];
                                                        
                                                    }];

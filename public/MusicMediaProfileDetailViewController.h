@@ -1,6 +1,10 @@
 
 #import "MusicMediaDetailViewController.h"
 
+
+
+
+
 @interface MusicMediaProfileDetailViewController : MusicMediaDetailViewController
 {
 }

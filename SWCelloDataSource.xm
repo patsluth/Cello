@@ -12,7 +12,9 @@
 #import "MusicEntityValueContext.h"
 #import "MusicCoalescingEntityValueProvider.h"
 
+#import "MusicMediaProductDetailViewController.h"
 #import "MusicMediaDetailViewController.h"
+#import "MusicContextualActionsHeaderViewController.h"
 
 #import "MusicContextualShowInStoreAlertAction.h"
 #import "MusicContextualStartStationAlertAction.h"
@@ -109,6 +111,8 @@ handler:nil]; \
     [self.celloPrefs refreshPrefs];
 }
 
+#define FORCE_CONTEXTUAL_HEADER_AS_PREVIEW
+
 - (UIViewController<SWCelloMediaEntityPreviewViewController> *)previewViewControllerForIndexPath:(NSIndexPath *)indexPath
 {
 #ifdef DEBUG
@@ -118,14 +122,27 @@ handler:nil]; \
 #endif
     
     __block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    
-    
     id<MusicEntityValueProviding> entityValueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
     UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController;
     
+    
+#ifdef FORCE_CONTEXTUAL_HEADER_AS_PREVIEW
+    
+    // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
+    // This will simulate clicking the contextual action header view, opening the view controller for the collection
+    previewViewController = [[%c(MusicContextualActionsHeaderViewController) alloc]
+                             initWithEntityValueContext:valueContext
+                             contextualActions:nil];
+    previewViewController.view.backgroundColor = [UIColor whiteColor];
+    
+#else 
+    
+    cello_blockTracklistEntityProver = YES;
     previewViewController = [self.delegate.libraryViewConfiguration previewViewControllerForEntityValueContext:valueContext
                                                                                             fromViewController:self.delegate];
+    cello_blockTracklistEntityProver = NO;
     
+#endif
     
     if (!previewViewController) {
         return nil;
@@ -273,9 +290,8 @@ handler:nil]; \
         MusicMediaDetailViewController *mediaDetailViewController = (MusicMediaDetailViewController *)previewViewController;
         
         // make sure header view is layed out and set our content size to it's height
-        [mediaDetailViewController.view setNeedsDisplay];
+        [mediaDetailViewController.view layoutSubviews];
         [mediaDetailViewController _updateMaximumHeaderHeight];
-        
         mediaDetailViewController.preferredContentSize = CGSizeMake(0.0, mediaDetailViewController.maximumHeaderSize.height);
         
     }
@@ -319,7 +335,11 @@ handler:nil]; \
             
         } else {
             
-            [self.delegate showViewController:viewControllerToCommit sender:self];
+            cello_blockTracklistEntityProver = NO;
+            UIViewController *previewViewController = [self.delegate.libraryViewConfiguration
+                                                       previewViewControllerForEntityValueContext:valueContext
+                                                       fromViewController:self.delegate];
+            [self.delegate showViewController:previewViewController sender:self];
             
         }
         
