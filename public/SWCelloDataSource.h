@@ -30,6 +30,12 @@
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
      commitViewController:(UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit;
 
+
+// Must be UIPreviewAction or UITableViewRowAction
+- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath actionClass:(Class)actionClass;
+- (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title;
+- (UITableViewRowAction *)tableViewRowActionForKey:(NSString *)key title:(NSString *)title;
+
 - (void)performShowInStoreActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performStartStationActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performUpNextAction:(SWCello_UpNextActionType)actionType forIndexPath:(NSIndexPath *)indexPath;

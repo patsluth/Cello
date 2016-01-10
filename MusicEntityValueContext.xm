@@ -17,6 +17,26 @@
 %hook MusicEntityValueContext
 
 %new
+- (BOOL)cello_isActionAvailableForKey:(NSString *)key
+{
+    if ([key isEqualToString:@"cello_showinstore"]) {
+        return [self cello_showInStoreAvailable];
+    } else if ([key isEqualToString:@"cello_startradiostation"]) {
+        return [self cello_startRadioStationAvailable];
+    } else if ([key isEqualToString:@"cello_playnext"] || [key isEqualToString:@"cello_addtoupnext"]) {
+        return [self cello_upNextAvailable];
+    } else if ([key isEqualToString:@"cello_addtoplaylist"]) {
+        return [self cello_addToPlaylistAvailable];
+    } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
+        return [self cello_makeAvailableOfflineAvailable];
+    } else if ([key isEqualToString:@"cello_deleteremove"]) {
+        return [self cello_deleteAvailable];
+    }
+    
+    return NO;
+}
+
+%new
 - (BOOL)cello_showInStoreAvailable
 {
     if ([self cello_isConcreteMediaItem]) {

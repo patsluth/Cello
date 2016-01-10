@@ -44,123 +44,126 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSGroupCell</string>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>SWCelloContextualActionsPSViewController</string>
 			<key>label</key>
 			<string>Peek Contextual Actions</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
 			<key>key</key>
-			<string>cello_showinstore_peek_enabled</string>
+			<string>cello_contextual_actions_peek</string>
 			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Show In Store</string>
+			<dict>
+				<key>enabled</key>
+				<array>
+					<dict>
+						<key>key</key>
+						<string>cello_showinstore</string>
+						<key>title</key>
+						<string>Show In Store</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_startradiostation</string>
+						<key>title</key>
+						<string>Start Radio Station</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_playnext</string>
+						<key>title</key>
+						<string>Play Next</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_addtoupnext</string>
+						<key>title</key>
+						<string>Add To Up Next</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_addtoplaylist</string>
+						<key>title</key>
+						<string>Add to Playlist</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_makeavailableoffline</string>
+						<key>title</key>
+						<string>Make Available Offline</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_deleteremove</string>
+						<key>title</key>
+						<string>Delete</string>
+					</dict>
+				</array>
+				<key>disabled</key>
+				<array/>
+			</dict>
 			<key>defaults</key>
 			<string>com.apple.Music</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSSwitchCell</string>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>SWCelloContextualActionsPSViewController</string>
+			<key>label</key>
+			<string>Slide Contextual Actions</string>
 			<key>key</key>
-			<string>cello_startradiostation_peek_enabled</string>
+			<string>cello_contextual_actions_slide</string>
 			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Start Radio Station</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_upnext_peek_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Up Next</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_addtoplaylist_peek_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Add to Playlist</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_makeavailableoffline_peek_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Make Available Offline</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_deleteremove_peek_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Delete</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Cell Swipe Contextual Actions</string>
-			<key>footerText</key>
-			<string>Disable all values to disable tableview cell sliding</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_upnext_slide_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Up Next</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_makeavailableoffline_slide_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Make Available Offline</string>
-			<key>defaults</key>
-			<string>com.apple.Music</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>key</key>
-			<string>cello_deleteremove_slide_enabled</string>
-			<key>default</key>
-			<true/>
-			<key>label</key>
-			<string>Delete</string>
+			<dict>
+				<key>enabled</key>
+				<array>
+					<dict>
+						<key>key</key>
+						<string>cello_playnext</string>
+						<key>title</key>
+						<string>Play Next</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_addtoupnext</string>
+						<key>title</key>
+						<string>Add To Up Next</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_makeavailableoffline</string>
+						<key>title</key>
+						<string>Make Available Offline</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_deleteremove</string>
+						<key>title</key>
+						<string>Delete</string>
+					</dict>
+				</array>
+				<key>disabled</key>
+				<array>
+					<dict>
+						<key>key</key>
+						<string>cello_showinstore</string>
+						<key>title</key>
+						<string>Show In Store</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_startradiostation</string>
+						<key>title</key>
+						<string>Start Radio Station</string>
+					</dict>
+					<dict>
+						<key>key</key>
+						<string>cello_addtoplaylist</string>
+						<key>title</key>
+						<string>Add to Playlist</string>
+					</dict>
+				</array>
+			</dict>
 			<key>defaults</key>
 			<string>com.apple.Music</string>
 		</dict>

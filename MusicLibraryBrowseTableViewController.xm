@@ -153,9 +153,7 @@
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // if all options are disabled then don't allow sliding
-    if (self.celloDataSource.celloPrefs.upNext_slide ||
-        self.celloDataSource.celloPrefs.makeAvailableOffline_slide ||
-        self.celloDataSource.celloPrefs.deleteRemove_slide) {
+    if (self.celloDataSource.celloPrefs.contextualActionsSlide.count > 0) {
         return YES;
     } else {
         return %orig(tableView, indexPath);
@@ -169,9 +167,7 @@
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // if all options are disabled then don't allow sliding
-    if (self.celloDataSource.celloPrefs.upNext_slide ||
-        self.celloDataSource.celloPrefs.makeAvailableOffline_slide ||
-        self.celloDataSource.celloPrefs.deleteRemove_slide) {
+    if (self.celloDataSource.celloPrefs.contextualActionsSlide.count > 0) {
         
         id<MusicEntityValueProviding> cell = [self cello_entityValueProviderAtIndexPath:indexPath];
         
@@ -197,96 +193,13 @@
 %new
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id<MusicEntityValueProviding> entityValueProvider = [self cello_entityValueProviderAtIndexPath:indexPath];
-    MusicEntityValueContext *valueContext = [self _entityValueContextAtIndexPath:indexPath];
-    
-    if (!entityValueProvider || !valueContext) {
-        return nil;
-    }
-    
-    
-    NSMutableArray *actions = [@[] mutableCopy];
-    
-    
-    if (self.celloDataSource.celloPrefs.upNext_slide &&
-        [valueContext cello_upNextAvailable]) {
-        
-        UITableViewRowAction *playNextAction = [UITableViewRowAction
-                                                rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                title:@"Play\nNext"
-                                                handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                    
-                                                    [self.celloDataSource performUpNextAction:SWCello_UpNextActionType_PlayNext
-                                                                                 forIndexPath:indexPath];
-                                                    [self.tableView setEditing:NO animated:YES];
-                                                    
-                                                }];
-        playNextAction.backgroundColor = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
-        [actions addObject:playNextAction];
-        
-        
-        UITableViewRowAction *addToUpNextAction = [UITableViewRowAction
-                                                   rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                   title:@"Up\nNext"
-                                                   handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                       
-                                                       [self.celloDataSource performUpNextAction:SWCello_UpNextActionType_AddToUpNext
-                                                                                    forIndexPath:indexPath];
-                                                       [self.tableView setEditing:NO animated:YES];
-                                                       
-                                                   }];
-        addToUpNextAction.backgroundColor = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
-        [actions addObject:addToUpNextAction];
-        
-    }
-    
-    
-    if (self.celloDataSource.celloPrefs.makeAvailableOffline_slide &&
-        [valueContext cello_makeAvailableOfflineAvailable]) {
-        
-        // so we know if the item is already downloaded or not
-        NSNumber *keepLocal = [entityValueProvider valueForEntityProperty:@"keepLocal"];
-        UITableViewRowAction *downloadAction = [UITableViewRowAction
-                                                rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                title:(keepLocal.boolValue ? @"Remove\nDownload" : @"Download")
-                                                handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                    
-                                                    [CATransaction begin];
-                                                    [CATransaction setCompletionBlock: ^{
-                                                        [self.celloDataSource performDownloadActionForIndexPath:indexPath];
-                                                    }];
-                                                    [self.tableView setEditing:NO animated:YES];
-                                                    [CATransaction commit];
-                                                    
-                                                    
-                                                }];
-        downloadAction.backgroundColor = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
-        [actions addObject:downloadAction];
-        
-    }
-    
-    
-    if (self.celloDataSource.celloPrefs.deleteRemove_slide &&
-        [valueContext cello_deleteAvailable]) {
-        
-        UITableViewRowAction *deleteAction = [UITableViewRowAction
-                                              rowActionWithStyle:UITableViewRowActionStyleDestructive
-                                              title:@"Delete"
-                                              handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-                                                  
-                                                  UIAlertController *deleteConfirmController = [self.celloDataSource deleteConfirmationAlertControllerForIndexPath:indexPath];
-                                                  [self presentViewController:deleteConfirmController animated:YES completion:nil];
-                                                  
-                                              }];
-        [actions addObject:deleteAction];
-        
-    }
-    
+    NSArray *actions = [self.celloDataSource availableActionsForIndexPath:indexPath actionClass:[UITableViewRowAction class]];
+    NSLog(@"PAT %@", actions);
     if (actions.count == 0) {
         return nil;
     }
     
-    return [actions copy];
+    return actions;
 }
 
 - (MusicEntityValueContext *)_entityValueContextAtIndexPath:(NSIndexPath *)indexPath

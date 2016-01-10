@@ -18,16 +18,11 @@
 
 @property (nonatomic, readonly) SWCello_ActionType popActionType;
 
-@property (nonatomic, readonly) BOOL showInStore_peek;
-@property (nonatomic, readonly) BOOL startRadioStation_peek;
-@property (nonatomic, readonly) BOOL upNext_peek;
-@property (nonatomic, readonly) BOOL addToPlaylist_peek;
-@property (nonatomic, readonly) BOOL makeAvailableOffline_peek;
-@property (nonatomic, readonly) BOOL deleteRemove_peek;
-
-@property (nonatomic, readonly) BOOL upNext_slide;
-@property (nonatomic, readonly) BOOL makeAvailableOffline_slide;
-@property (nonatomic, readonly) BOOL deleteRemove_slide;
+@property (strong, nonatomic, readonly) NSArray *contextualActionsPeek;
+@property (strong, nonatomic, readonly) NSArray *contextualActionsSlide;
+//FUTURE
+//@property (strong, nonatomic, readonly) NSArray *contextualActionsSlideLeft;
+//@property (strong, nonatomic, readonly) NSArray *contextualActionsSlideRight;
 
 - (void)refreshPrefs;
 

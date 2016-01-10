@@ -3,9 +3,9 @@
 
 
 
-FINALPACKAGE = 0
-DEBUG = 1
-PACKAGE_VERSION = 1.0-4
+FINALPACKAGE = 1
+DEBUG = 0
+PACKAGE_VERSION = 1.0-5
 
 
 
@@ -27,6 +27,7 @@ TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
 SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicContextualActionsHeaderViewController.xm MusicEntityValueContext.xm MusicLibraryBrowseCollectionViewController.xm MusicLibraryBrowseTableViewController.xm MusicLibraryComposersViewConfiguration.xm MusicLibraryGenresViewConfiguration.xm MusicLibrarySongsViewConfiguration.xm MusicLibraryViewConfiguration.xm MusicMediaDetailViewController.xm SWCelloDataSource.xm SWCelloPrefs.xm
 ifeq ($(DEBUG), 1)
+    SWCello_CFLAGS += -Wno-unused-variable
     SWCello_FILES += SWCelloTest.xm #SWCelloDebug.xm
 endif
 
@@ -64,6 +65,7 @@ include theos/makefiles/swcommon.mk
 
 after-install::
 	$(ECHO_NOTHING)install.exec "killall -9 Music > /dev/null 2> /dev/null"; echo -n '';$(ECHO_END)
+	$(ECHO_NOTHING)install.exec "killall -9 Preferences > /dev/null 2> /dev/null"; echo -n '';$(ECHO_END)
 
 
 

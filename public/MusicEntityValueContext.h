@@ -32,6 +32,7 @@
 - (void)resetOutputValues;
 
 
+- (BOOL)cello_isActionAvailableForKey:(NSString *)key;
 - (BOOL)cello_showInStoreAvailable;
 - (BOOL)cello_startRadioStationAvailable;
 - (BOOL)cello_upNextAvailable;

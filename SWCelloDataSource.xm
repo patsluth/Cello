@@ -79,6 +79,8 @@ handler:nil]; \
 @property (weak, nonatomic, readwrite) UIViewController<SWCelloMusicLibraryBrowseDelegate> *delegate;
 @property (strong, nonatomic, readwrite) SWCelloPrefs *celloPrefs;
 
+@property (strong, nonatomic) id cachedCommitViewController;
+
 @end
 
 
@@ -86,6 +88,8 @@ handler:nil]; \
 
 
 @implementation SWCelloDataSource
+
+#pragma mark - Init
 
 - (id)initWithDelegate:(UIViewController<SWCelloMusicLibraryBrowseDelegate> *)delegate
 {
@@ -111,6 +115,8 @@ handler:nil]; \
     [self.celloPrefs refreshPrefs];
 }
 
+#pragma mark - UIViewControllerPreviewing
+
 #define FORCE_CONTEXTUAL_HEADER_AS_PREVIEW
 
 - (UIViewController<SWCelloMediaEntityPreviewViewController> *)previewViewControllerForIndexPath:(NSIndexPath *)indexPath
@@ -121,9 +127,11 @@ handler:nil]; \
     
 #endif
     
+    
+    
     __block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    id<MusicEntityValueProviding> entityValueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
     UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController;
+    
     
     
 #ifdef FORCE_CONTEXTUAL_HEADER_AS_PREVIEW
@@ -142,150 +150,8 @@ handler:nil]; \
                                                                                             fromViewController:self.delegate];
     cello_blockTracklistEntityProver = NO;
     
-#endif
-    
-    if (!previewViewController) {
-        return nil;
-    }
-    
-    
-    NSMutableArray *actions = [@[] mutableCopy];
-    
-    
-    if (self.celloPrefs.showInStore_peek && [valueContext cello_showInStoreAvailable]) {
-        
-        UIPreviewAction *showInStoreAction = [UIPreviewAction
-                                              actionWithTitle:@"Show in iTunes Store"
-                                              style:UIPreviewActionStyleDefault
-                                              handler:^(UIPreviewAction * _Nonnull action,
-                                                        UIViewController * _Nonnull previewViewController) {
-                                                  
-                                                  [self performShowInStoreActionForIndexPath:indexPath];
-                                                  SW_PIRACY;
-                                                  
-                                              }];
-        [actions addObject: showInStoreAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.startRadioStation_peek && [valueContext cello_startRadioStationAvailable]) {
-        
-        UIPreviewAction *startRadioStationAction = [UIPreviewAction
-                                                    actionWithTitle:@"Start Radio Station"
-                                                    style:UIPreviewActionStyleDefault
-                                                    handler:^(UIPreviewAction * _Nonnull action,
-                                                              UIViewController * _Nonnull previewViewController) {
-                                                        
-                                                        [self performStartStationActionForIndexPath:indexPath];
-                                                        SW_PIRACY;
-                                                        
-                                                    }];
-        [actions addObject: startRadioStationAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.upNext_peek && [valueContext cello_upNextAvailable]) {
-        
-        UIPreviewAction *playNextAction = [UIPreviewAction
-                                           actionWithTitle:@"Play Next"
-                                           style:UIPreviewActionStyleDefault
-                                           handler:^(UIPreviewAction * _Nonnull action,
-                                                     UIViewController * _Nonnull previewViewController) {
-                                               
-                                               valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-                                               [self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
-                                               SW_PIRACY;
-                                               
-                                           }];
-        [actions addObject: playNextAction];
-        
-        
-        UIPreviewAction *addToUpNextAction = [UIPreviewAction
-                                              actionWithTitle:@"Add to Up Next"
-                                              style:UIPreviewActionStyleDefault
-                                              handler:^(UIPreviewAction * _Nonnull action,
-                                                        UIViewController * _Nonnull previewViewController) {
-                                                  
-                                                  valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-                                                  [self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
-                                                  SW_PIRACY;
-                                                  
-                                              }];
-        [actions addObject: addToUpNextAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.addToPlaylist_peek && [valueContext cello_addToPlaylistAvailable]) {
-        
-        UIPreviewAction *addToPlaylistAction = [UIPreviewAction
-                                                actionWithTitle:@"Add to Playlist"
-                                                style:UIPreviewActionStyleDefault
-                                                handler:^(UIPreviewAction * _Nonnull action,
-                                                          UIViewController * _Nonnull previewViewController) {
-                                                    
-                                                    [self performAddToPlaylistActionForIndexPath:indexPath];
-                                                    SW_PIRACY;
-                                                    
-                                                }];
-        [actions addObject: addToPlaylistAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.makeAvailableOffline_peek && [valueContext cello_makeAvailableOfflineAvailable]) {
-        
-        // so we know if the item is already downloaded or not
-        NSNumber *keepLocal = [entityValueProvider valueForEntityProperty:@"keepLocal"];
-        NSString *downloadActionTitle;
-        if (keepLocal.boolValue) {
-            if ([valueContext cello_isConcreteMediaItem]) {
-                downloadActionTitle = @"Remove Download";
-            } else {
-                downloadActionTitle = @"Remove Downloads";
-            }
-        } else {
-            downloadActionTitle = @"Make Available Offline";
-        }
-        
-        UIPreviewAction *downloadAction = [UIPreviewAction
-                                           actionWithTitle:downloadActionTitle
-                                           style:UIPreviewActionStyleDefault
-                                           handler:^(UIPreviewAction * _Nonnull action,
-                                                     UIViewController * _Nonnull previewViewController) {
-                                               
-                                               [self performDownloadActionForIndexPath:indexPath];
-                                               SW_PIRACY;
-                                               
-                                           }];
-        [actions addObject: downloadAction];
-        
-    }
-    
-    
-    if (self.celloPrefs.deleteRemove_peek && [valueContext cello_deleteAvailable]) {
-        
-        UIPreviewAction *deleteAction = [UIPreviewAction
-                                         actionWithTitle:@"Delete"
-                                         style:UIPreviewActionStyleDestructive
-                                         handler:^(UIPreviewAction * _Nonnull action,
-                                                   UIViewController * _Nonnull previewViewController) {
-                                             
-                                             UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
-                                             [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
-                                             
-                                         }];
-        [actions addObject: deleteAction];
-        
-    }
-    
-    
-    
-    
     // Cut these views down to size to only show the header in the preview
-    if ([previewViewController isKindOfClass:%c(MusicMediaDetailViewController)]) {
+    if (previewViewController && [previewViewController isKindOfClass:%c(MusicMediaDetailViewController)]) {
         
         MusicMediaDetailViewController *mediaDetailViewController = (MusicMediaDetailViewController *)previewViewController;
         
@@ -296,9 +162,27 @@ handler:nil]; \
         
     }
     
+#endif
+    
+    
     
     previewViewController.celloPreviewIndexPath = indexPath;
-    previewViewController.celloPreviewActionItems = [actions copy];
+    previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath actionClass:[UIPreviewAction class]];
+    
+    
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul), ^{ // background thread
+        
+        UIViewController *commitViewController = [self.delegate.libraryViewConfiguration
+                                                   previewViewControllerForEntityValueContext:valueContext
+                                                   fromViewController:self.delegate];
+        
+        dispatch_sync(dispatch_get_main_queue(), ^{ // completed
+            self.cachedCommitViewController = commitViewController;
+        });
+    });
+    
+    
     
     
 #ifdef DEBUG
@@ -321,26 +205,27 @@ handler:nil]; \
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
      commitViewController:(UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit
 {
+    cello_blockTracklistEntityProver = NO;
+    
     NSIndexPath *indexPath = viewControllerToCommit.celloPreviewIndexPath;
     MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
     
     
     if (self.celloPrefs.popActionType == SWCello_ActionType_PushViewController) {
         
-        if ([viewControllerToCommit isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) {
-            
-            // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
-            // This will simulate clicking the contextual action header view, opening the view controller for the collection
+        UIViewController *previewViewController = self.cachedCommitViewController;
+        self.cachedCommitViewController = nil;
+        
+        if (!previewViewController) { // Incase the background thread hasn't completed (highly unlikely)
+            previewViewController = [self.delegate.libraryViewConfiguration
+                                     previewViewControllerForEntityValueContext:valueContext
+                                     fromViewController:self.delegate];
+        }
+        
+        if ([previewViewController isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) { // Simulate tapping on the header
             [self.delegate.libraryViewConfiguration handleSelectionOfEntityValueContext:valueContext fromViewController:self.delegate];
-            
         } else {
-            
-            cello_blockTracklistEntityProver = NO;
-            UIViewController *previewViewController = [self.delegate.libraryViewConfiguration
-                                                       previewViewControllerForEntityValueContext:valueContext
-                                                       fromViewController:self.delegate];
             [self.delegate showViewController:previewViewController sender:self];
-            
         }
         
     } else {
@@ -363,7 +248,190 @@ handler:nil]; \
         }
         
     }
+    
+    SW_PIRACY;
 }
+
+#pragma mark - Actions(Instantiate)
+
+- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath actionClass:(Class)actionClass
+{
+    __block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+    id<MusicEntityValueProviding> entityValueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+    NSMutableArray *actions = [@[] mutableCopy];
+    NSArray *enabledActionDataSource; // The preference array for actionClass
+    
+    
+    if (actionClass == [UIPreviewAction class]) {
+        enabledActionDataSource = self.celloPrefs.contextualActionsPeek;
+    } else if (actionClass == [UITableViewRowAction class]) {
+        enabledActionDataSource = self.celloPrefs.contextualActionsSlide;
+    } else {
+        return nil;
+    }
+    
+    
+    for (NSDictionary *action in enabledActionDataSource) {
+        
+        NSString *key = [action valueForKey:@"key"];
+        NSString *title = [action valueForKey:@"title"];
+        
+        // Get our action if it is available for key
+        if ([valueContext cello_isActionAvailableForKey:key]) {
+            
+            // Special scenario for make available offline action
+            if ([key isEqualToString:@"cello_makeavailableoffline"]){
+                if ([[entityValueProvider valueForEntityProperty:@"keepLocal"] boolValue]) {
+                    if ([valueContext cello_isConcreteMediaItem]) {
+                        title = @"Remove Download";
+                    } else {
+                        title = @"Remove Downloads";
+                    }
+                }
+            }
+            
+            id previewAction;
+            
+            if (actionClass == [UIPreviewAction class]) {
+                previewAction = [self uipreviewActionForKey:key title:title];
+            } else if (actionClass == [UITableViewRowAction class]) {
+                previewAction = [self tableViewRowActionForKey:key title:title];
+            }
+            
+            if (previewAction) {
+                [actions addObject:previewAction];
+            }
+            
+        }
+        
+    }
+    
+    return [actions copy];
+}
+
+- (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title
+{
+    id handler = ^(UIPreviewAction *action, UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController) {
+        
+        NSIndexPath *indexPath = previewViewController.celloPreviewIndexPath;
+        
+        if ([key isEqualToString:@"cello_showinstore"]) {
+            
+            [self performShowInStoreActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_startradiostation"]) {
+            
+            [self performStartStationActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_playnext"]) {
+            
+            [self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_addtoupnext"]) {
+            
+            [self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
+            
+        }  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
+            
+            [self performAddToPlaylistActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
+            
+            [self performDownloadActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_deleteremove"]) {
+            
+            UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
+            [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
+            
+        }
+        
+        SW_PIRACY;
+        
+    };
+    
+    UIPreviewAction *previewAction = [UIPreviewAction actionWithTitle:title
+                                                                style:UIPreviewActionStyleDefault
+                                                              handler:handler];
+    return previewAction;
+}
+
+- (UITableViewRowAction *)tableViewRowActionForKey:(NSString *)key title:(NSString *)title
+{
+    UIColor *color;
+    //TEMPORARY
+    if ([key isEqualToString:@"cello_showinstore"]) {
+        title = @"Store";
+        color = [UIColor orangeColor];
+    } else if ([key isEqualToString:@"cello_startradiostation"]) {
+        title = @"Radio";
+        color = [UIColor greenColor];
+    } else if ([key isEqualToString:@"cello_playnext"]) {
+        title = @"Play\nNext";
+        color = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
+    } else if ([key isEqualToString:@"cello_addtoupnext"]) {
+        title = @"Queue";
+        color = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
+    }  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
+        title = @"+\nPlaylist";
+        color = [UIColor cyanColor];
+    } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
+        title = @"Download";
+        color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
+    } else if ([key isEqualToString:@"cello_deleteremove"]) {
+        title = @"Delete";
+        color = [UIColor redColor];
+    }
+    
+    
+    
+    id handler = ^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+        
+        if ([key isEqualToString:@"cello_showinstore"]) {
+            
+            [self performShowInStoreActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_startradiostation"]) {
+            
+            [self performStartStationActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_playnext"]) {
+            
+            [self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_addtoupnext"]) {
+            
+            [self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
+            
+        }  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
+            
+            [self performAddToPlaylistActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
+            
+            [self performDownloadActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_deleteremove"]) {
+            
+            UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
+            [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
+            
+        }
+        
+        SW_PIRACY;
+        
+    };
+    
+    UITableViewRowAction *rowAction = [UITableViewRowAction
+                                       rowActionWithStyle:UITableViewRowActionStyleNormal
+                                       title:title
+                                       handler:handler];
+    rowAction.backgroundColor = color;
+    
+    return rowAction;
+}
+
+#pragma mark - Actions(Perform)
 
 - (void)performShowInStoreActionForIndexPath:(NSIndexPath *)indexPath
 {

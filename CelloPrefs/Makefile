@@ -12,7 +12,7 @@ TARGET = iphone:clang:latest:7.0
 
 BUNDLE_NAME = CelloPrefs
 CelloPrefs_CFLAGS = -fobjc-arc
-CelloPrefs_FILES = SWCelloPSListController.mm
+CelloPrefs_FILES = SWCelloContextualActionsPSViewController.mm SWCelloPSListController.mm
 CelloPrefs_INSTALL_PATH = /Library/PreferenceBundles
 CelloPrefs_FRAMEWORKS = UIKit
 CelloPrefs_PRIVATE_FRAMEWORKS = Preferences

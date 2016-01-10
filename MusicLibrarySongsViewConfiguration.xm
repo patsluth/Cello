@@ -50,24 +50,6 @@ fromViewController:(id<MusicClientContextConsuming>)viewController
                                                                                                clientContext:viewController.clientContext
                                                                        existingJSProductNativeViewController:nil];
     
-    
-    
-//    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul);
-//    dispatch_async(queue, ^{
-//        
-//        // create identical view controller with full tracklist on background thread
-//        UIViewController<SWCelloMediaEntityPreviewViewController> *commitViewController;
-//        commitViewController = [[%c(MusicMediaAlbumDetailViewController) alloc] initWithContainerEntityProvider:albumProvider
-//                                                                                        tracklistEntityProvider:titlesProvider
-//                                                                                                  clientContext:viewController.clientContext
-//                                                                          existingJSProductNativeViewController:nil];
-//        
-//        dispatch_sync(dispatch_get_main_queue(), ^{
-//            previewViewController.celloCommitViewController = commitViewController;
-//        });
-//    });
-    
-    
     return previewViewController;
 }
 

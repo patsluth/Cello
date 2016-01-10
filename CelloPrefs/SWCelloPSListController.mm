@@ -27,6 +27,13 @@
 
 @implementation SWCelloPSListController
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self reloadSpecifiers];
+}
+
 - (void)resetAllSettings:(PSSpecifier *)specifier
 {
     NSDictionary *prefDefaults = [NSDictionary dictionaryWithContentsOfFile:[self.bundle pathForResource:@"prefsDefaults" ofType:@".plist"]];
