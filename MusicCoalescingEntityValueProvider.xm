@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Pat Sluth. All rights reserved.
 //
 
-#import "MusicCoalescingEntityValueProvider.h"
+#import <FuseUI/MusicCoalescingEntityValueProvider.h>
 
 
 

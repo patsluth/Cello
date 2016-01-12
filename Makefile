@@ -25,7 +25,19 @@ TARGET = iphone:clang:latest:7.0
 
 TWEAK_NAME = SWCello
 SWCello_CFLAGS = -fobjc-arc
-SWCello_FILES = MusicCoalescingEntityValueProvider.xm MusicContextualActionsHeaderViewController.xm MusicEntityValueContext.xm MusicLibraryBrowseCollectionViewController.xm MusicLibraryBrowseTableViewController.xm MusicLibraryComposersViewConfiguration.xm MusicLibraryGenresViewConfiguration.xm MusicLibrarySongsViewConfiguration.xm MusicLibraryViewConfiguration.xm MusicMediaDetailViewController.xm SWCelloDataSource.xm SWCelloPrefs.xm
+SWCello_FILES = MusicCoalescingEntityValueProvider.xm \
+                MusicContextualActionsHeaderViewController.xm \
+                MusicEntityValueContext.xm \
+                MusicLibraryBrowseCollectionViewController.xm \
+                MusicLibraryBrowseTableViewController.xm \
+                MusicLibraryComposersViewConfiguration.xm \
+                MusicLibraryGenresViewConfiguration.xm \
+                MusicLibrarySongsViewConfiguration.xm \
+                MusicLibraryViewConfiguration.xm \
+                MusicMediaDetailViewController.xm \
+                SWCelloDataSource.xm \
+                SWCelloPrefs.xm \
+
 ifeq ($(DEBUG), 1)
     SWCello_CFLAGS += -Wno-unused-variable
     SWCello_FILES += SWCelloTest.xm #SWCelloDebug.xm

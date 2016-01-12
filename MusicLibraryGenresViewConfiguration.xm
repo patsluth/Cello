@@ -2,15 +2,16 @@
 //  MusicLibraryGenresViewConfiguration.xm
 //  Cello
 //
-//  Created by Pat Sluth on 2015*12*27.
+//  Created by Pat Sluth on 2015-12-27.
 //
 //
 
-#import "MusicLibraryGenresViewConfiguration.h"
-#import "MusicEntityValueContext.h"
+#import <FuseUI/MusicLibraryGenresViewConfiguration.h>
+#import <FuseUI/MusicContextualActionsHeaderViewController.h>
 
 #import "SWCelloMediaEntityPreviewViewController.h"
-#import "MusicContextualActionsHeaderViewController.h"
+
+#import "MusicEntityValueContext+SW.h"
 
 
 

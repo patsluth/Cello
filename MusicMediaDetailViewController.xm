@@ -6,7 +6,7 @@
 //
 //
 
-#import "MusicMediaProductDetailViewController.h"
+#import <FuseUI/MusicMediaProductDetailViewController.h>
 
 
 

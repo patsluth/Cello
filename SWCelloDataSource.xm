@@ -2,27 +2,30 @@
 //  SWCelloTest.m
 //  Cello
 //
-//  Created by Pat Sluth on 2015*12*27.
+//  Created by Pat Sluth on 2015-12-27.
 //
 //
 
 #import "SWCelloDataSource.h"
 #import "SWCelloPrefs.h"
 
-#import "MusicEntityValueContext.h"
-#import "MusicCoalescingEntityValueProvider.h"
+#import <FuseUI/MusicCoalescingEntityValueProvider.h>
+#import <FuseUI/MusicMediaProductDetailViewController.h>
 
-#import "MusicMediaProductDetailViewController.h"
-#import "MusicMediaDetailViewController.h"
-#import "MusicContextualActionsHeaderViewController.h"
+// Contextual Actions
+#import <FuseUI/MusicContextualActionsHeaderViewController.h>
+// ******************
+#import <FuseUI/MusicContextualShowInStoreAlertAction.h>
+#import <FuseUI/MusicContextualStartStationAlertAction.h>
+#import <FuseUI/MusicContextualUpNextAlertAction.h>
+#import <FuseUI/MusicContextualAddToPlaylistAlertAction.h>
+#import <FuseUI/MusicContextualLibraryUpdateAlertAction.h>
+#import <FuseUI/MusicContextualRemoveFromPlaylistAlertAction.h>
+#import <FuseUI/MusicContextualPlaylistPickerViewController.h>
+// ******************
 
-#import "MusicContextualShowInStoreAlertAction.h"
-#import "MusicContextualStartStationAlertAction.h"
-#import "MusicContextualUpNextAlertAction.h"
-#import "MusicContextualAddToPlaylistAlertAction.h"
-#import "MusicContextualLibraryUpdateAlertAction.h"
-#import "MusicContextualRemoveFromPlaylistAlertAction.h"
-#import "MusicContextualPlaylistPickerViewController.h"
+#import "MusicEntityValueContext+SW.h"
+#import "MusicMediaDetailViewController+SW.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 #import <MobileGestalt/MobileGestalt.h>
@@ -145,10 +148,10 @@ handler:nil]; \
     
 #else 
     
-    cello_blockTracklistEntityProver = YES;
+    //cello_blockTracklistEntityProver = YES;
     previewViewController = [self.delegate.libraryViewConfiguration previewViewControllerForEntityValueContext:valueContext
                                                                                             fromViewController:self.delegate];
-    cello_blockTracklistEntityProver = NO;
+    //cello_blockTracklistEntityProver = NO;
     
     // Cut these views down to size to only show the header in the preview
     if (previewViewController && [previewViewController isKindOfClass:%c(MusicMediaDetailViewController)]) {
@@ -205,7 +208,7 @@ handler:nil]; \
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
      commitViewController:(UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit
 {
-    cello_blockTracklistEntityProver = NO;
+    //cello_blockTracklistEntityProver = NO;
     
     NSIndexPath *indexPath = viewControllerToCommit.celloPreviewIndexPath;
     MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];

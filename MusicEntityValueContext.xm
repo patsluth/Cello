@@ -6,8 +6,7 @@
 //  Copyright (c) 2015 Pat Sluth. All rights reserved.
 //
 
-#import "MusicEntityValueContext.h"
-
+#import "MusicEntityValueContext+SW.h"
 #import "MPMediaItemCollection+SW.h"
 
 

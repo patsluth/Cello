@@ -9,12 +9,13 @@
 #import "SWCelloDataSource.h"
 #import "SWCelloMediaEntityPreviewViewController.h"
 
-#import "MusicLibraryBrowseCollectionViewController.h"
-#import "MusicLibraryBrowseHeterogenousCollectionViewController.h"
-#import "MusicLibrarySearchResultsViewController.h"
+#import "MusicEntityValueContext+SW.h"
+#import "MusicLibraryBrowseCollectionViewController+SW.h"
 
-#import "MusicEntityValueContext.h"
-#import "MusicEntityContentDescriptorViewConfiguring.h"
+#import <FuseUI/MusicEntityContentDescriptorViewConfiguring.h>
+#import <FuseUI/MusicLibraryBrowseHeterogenousCollectionViewController.h>
+#import <FuseUI/MusicLibrarySearchResultsViewController.h>
+
 
 
 

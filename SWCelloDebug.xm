@@ -2,12 +2,12 @@
 //  SWCelloDebug.m
 //  Cello
 //
-//  Created by Pat Sluth on 2015*12*27.
+//  Created by Pat Sluth on 2015-12-27.
 //
 //
 
-#import "MusicMediaEntityProvider.h"
-#import "MusicEntityValueContext.h"
+#import "MusicMediaEntityProvider+SW.h"
+#import "MusicEntityValueContext+SW.h"
 
 // TODO: MOVE TO libsluthware
 #define LOG_METHOD_START NSLog(@"");NSLog(@"");NSLog(@"****************************************************************"); \

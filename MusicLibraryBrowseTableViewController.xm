@@ -9,16 +9,16 @@
 #import "SWCelloDataSource.h"
 #import "SWCelloMediaEntityPreviewViewController.h"
 
-#import "MusicLibraryBrowseTableViewController.h"
-#import "MusicProfileAlbumsViewController.h"
+#import "MusicEntityValueContext+SW.h"
+#import "MusicLibraryBrowseTableViewController+SW.h"
 
-#import "MusicEntityValueContext.h"
-#import "MusicEntityContentDescriptorViewConfiguring.h"
+#import <FuseUI/MusicEntityContentDescriptorViewConfiguring.h>
+#import <FuseUI/MusicProfileAlbumsViewController.h>
 
 //TODO: Consilidate to SWCelloDataSource (UITABLEVIEW / UICOLLECTIONVIEW editing)
 #import "SWCello.h"
 #import "SWCelloPrefs.h"
-#import "MusicCoalescingEntityValueProvider.h"
+#import <FuseUI/MusicCoalescingEntityValueProvider.h>
 
 
 
@@ -135,6 +135,7 @@
     return nil;
 }
 
+// pop
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
 {
     [self cello_previewingContext:previewingContext commitViewController:viewControllerToCommit];
@@ -194,7 +195,7 @@
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *actions = [self.celloDataSource availableActionsForIndexPath:indexPath actionClass:[UITableViewRowAction class]];
-    NSLog(@"PAT %@", actions);
+    
     if (actions.count == 0) {
         return nil;
     }

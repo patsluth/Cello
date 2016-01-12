@@ -9,9 +9,9 @@
 #ifndef SWCelloMusicLibraryBrowseDelegate_h
 #define SWCelloMusicLibraryBrowseDelegate_h
 
-#import "MusicClientContextConsuming.h"
-#import "MusicLibraryViewConfigurationConsuming.h"
-#import "MusicEntityValueProviding.h"
+#import <FuseUI/MusicClientContextConsuming.h>
+#import <FuseUI/MusicLibraryViewConfigurationConsuming.h>
+#import <FuseUI/MusicEntityValueProviding.h>
 
 @class MusicEntityValueContext, SWCelloDataSource;
 

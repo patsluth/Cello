@@ -2,19 +2,20 @@
 //  MusicLibrarySongsViewConfiguration.xm
 //  Cello
 //
-//  Created by Pat Sluth on 2015*12*27.
+//  Created by Pat Sluth on 2015-12-27.
 //
 //
 
-#import "MusicLibrarySongsViewConfiguration.h"
-#import "MusicMediaEntityProvider.h"
-#import "MusicEntityValueContext.h"
+#import <FuseUI/MusicLibrarySongsViewConfiguration.h>
+#import <FuseUI/MusicMediaAlbumDetailViewController.h>
+#import <FuseUI/MusicMediaEntityProvider.h>
 
 #import "SWCelloMediaEntityPreviewViewController.h"
-#import "MusicMediaAlbumDetailViewController.h"
+
+#import "MusicEntityValueContext+SW.h"
+#import "MPMediaEntity+SW.h"
 
 #import <MediaPlayer/MediaPlayer.h>
-#import "MPMediaEntity+SW.h"
 
 
 

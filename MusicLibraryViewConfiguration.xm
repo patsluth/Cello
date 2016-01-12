@@ -2,13 +2,14 @@
 //  MusicLibrarySearchResultsEntityProviderConfiguration.xm
 //  Cello
 //
-//  Created by Pat Sluth on 2015*12*27.
+//  Created by Pat Sluth on 2015-12-27.
 //
 //
 
-#import "MusicLibrarySearchResultsEntityProviderConfiguration.h"
-#import "MusicLibraryViewConfiguration.h"
-#import "MusicEntityValueContext.h"
+#import <FuseUI/MusicLibrarySearchResultsEntityProviderConfiguration.h>
+#import <FuseUI/MusicLibraryViewConfiguration.h>
+
+#import "MusicEntityValueContext+SW.h"
 
 
 

@@ -43,8 +43,8 @@
 				2E6EAA131C358DBF0050B13A /* MusicLibrarySongsViewConfiguration.xm */,
 				2E6EAA161C359EB10050B13A /* MusicLibraryViewConfiguration.xm */,
 				2EB72E8E1C2C427A0016825A /* MusicMediaDetailViewController.xm */,
-				2EC644381C319EB80014A675 /* SWCelloDebug.xm */,
 				2E6EAA121C35726F0050B13A /* SWCelloDataSource.xm */,
+				2EC644381C319EB80014A675 /* SWCelloDebug.xm */,
 				2E6F41451C304DE900B9361F /* SWCelloPrefs.xm */,
 				2E0CB1661C34504E0059D1CF /* SWCelloTest.xm */,
 			);
