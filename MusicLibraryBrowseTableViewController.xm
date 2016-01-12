@@ -14,11 +14,13 @@
 
 #import <FuseUI/MusicEntityContentDescriptorViewConfiguring.h>
 #import <FuseUI/MusicProfileAlbumsViewController.h>
+#import <FuseUI/MusicHUDViewController.h>
 
 //TODO: Consilidate to SWCelloDataSource (UITABLEVIEW / UICOLLECTIONVIEW editing)
 #import "SWCello.h"
 #import "SWCelloPrefs.h"
 #import <FuseUI/MusicCoalescingEntityValueProvider.h>
+
 
 
 
@@ -89,7 +91,12 @@
 - (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
     if (self.presentedViewController) {
-        return nil;
+        
+        if ([self.presentedViewController isKindOfClass:%c(MusicHUDViewController)]) {
+            [(MusicHUDViewController *)self.presentedViewController dismissAnimated:NO completion:nil];
+        } else {
+            return nil;
+        }
     }
     
     

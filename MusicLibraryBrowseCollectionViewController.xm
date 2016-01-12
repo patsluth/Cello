@@ -15,6 +15,7 @@
 #import <FuseUI/MusicEntityContentDescriptorViewConfiguring.h>
 #import <FuseUI/MusicLibraryBrowseHeterogenousCollectionViewController.h>
 #import <FuseUI/MusicLibrarySearchResultsViewController.h>
+#import <FuseUI/MusicHUDViewController.h>
 
 
 
@@ -80,7 +81,12 @@
 - (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
     if (self.presentedViewController) {
-        return nil;
+        
+        if ([self.presentedViewController isKindOfClass:%c(MusicHUDViewController)]) {
+            [(MusicHUDViewController *)self.presentedViewController dismissAnimated:NO completion:nil];
+        } else {
+            return nil;
+        }
     }
     
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
