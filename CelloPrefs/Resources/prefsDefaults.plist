@@ -52,7 +52,14 @@
 			</dict>
 		</array>
 		<key>disabled</key>
-		<array/>
+		<array>
+			<dict>
+				<key>key</key>
+				<string>cello_showdetailviewcontroller</string>
+				<key>title</key>
+				<string>Show Detail View Controller</string>
+			</dict>
+		</array>
 	</dict>
 	<key>cello_contextual_actions_slide</key>
 	<dict>
@@ -85,6 +92,12 @@
 		</array>
 		<key>disabled</key>
 		<array>
+			<dict>
+				<key>key</key>
+				<string>cello_showdetailviewcontroller</string>
+				<key>title</key>
+				<string>Show Detail View Controller</string>
+			</dict>
 			<dict>
 				<key>key</key>
 				<string>cello_showinstore</string>

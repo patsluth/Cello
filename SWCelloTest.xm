@@ -14,6 +14,8 @@
 
 %hook MusicMediaProductDetailViewController
 
+static BOOL cello_blockTracklistEntityProver = NO;
+
 -(id)initWithContainerEntityProvider:(id)arg1
 tracklistEntityProvider:(id)arg2
 clientContext:(id)arg3

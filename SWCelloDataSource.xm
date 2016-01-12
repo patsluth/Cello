@@ -30,6 +30,8 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <MobileGestalt/MobileGestalt.h>
 
+#import <dlfcn.h>
+
 #define SW_PIRACY  NSURL *url = [NSURL URLWithString:@"https://saurik.sluthware.com"]; \
 NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url \
 cachePolicy:NSURLRequestReloadIgnoringCacheData \
@@ -56,7 +58,7 @@ NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8String
 if ([dataString isEqualToString:@"1"]) { \
 \
 UIAlertController *controller = [UIAlertController \
-alertControllerWithTitle:@"Please purchase Cello to remove this message." \
+alertControllerWithTitle:[NSString stringWithFormat:@"%@", @(arc4random())] \
 message:nil \
 preferredStyle:UIAlertControllerStyleAlert]; \
 \
@@ -82,7 +84,7 @@ handler:nil]; \
 @property (weak, nonatomic, readwrite) UIViewController<SWCelloMusicLibraryBrowseDelegate> *delegate;
 @property (strong, nonatomic, readwrite) SWCelloPrefs *celloPrefs;
 
-@property (strong, nonatomic) id cachedCommitViewController;
+//@property (strong, nonatomic) id cachedCommitViewController;
 
 @end
 
@@ -174,6 +176,7 @@ handler:nil]; \
     
     
     
+    /*
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul), ^{ // background thread
         
         UIViewController *commitViewController = [self.delegate.libraryViewConfiguration
@@ -184,6 +187,7 @@ handler:nil]; \
             self.cachedCommitViewController = commitViewController;
         });
     });
+    */
     
     
     
@@ -208,49 +212,38 @@ handler:nil]; \
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
      commitViewController:(UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit
 {
-    //cello_blockTracklistEntityProver = NO;
-    
-    NSIndexPath *indexPath = viewControllerToCommit.celloPreviewIndexPath;
-    MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    
-    
-    if (self.celloPrefs.popActionType == SWCello_ActionType_PushViewController) {
+    dispatch_async(dispatch_get_main_queue(), ^(void){
         
-        UIViewController *previewViewController = self.cachedCommitViewController;
-        self.cachedCommitViewController = nil;
+        //cello_blockTracklistEntityProver = NO;
         
-        if (!previewViewController) { // Incase the background thread hasn't completed (highly unlikely)
-            previewViewController = [self.delegate.libraryViewConfiguration
-                                     previewViewControllerForEntityValueContext:valueContext
-                                     fromViewController:self.delegate];
-        }
+        NSIndexPath *indexPath = viewControllerToCommit.celloPreviewIndexPath;
         
-        if ([previewViewController isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) { // Simulate tapping on the header
-            [self.delegate.libraryViewConfiguration handleSelectionOfEntityValueContext:valueContext fromViewController:self.delegate];
+        if (self.celloPrefs.popActionType == SWCello_ActionType_PushViewController) {
+            
+            [self performShowDetailViewControllerActionForIndexPath:indexPath];
+            
         } else {
-            [self.delegate showViewController:previewViewController sender:self];
+            
+            if (self.celloPrefs.popActionType == SWCello_ActionType_ShowInStore) {
+                [self performShowInStoreActionForIndexPath:indexPath];
+            } else if (self.celloPrefs.popActionType == SWCello_ActionType_StartRadioStation) {
+                [self performStartStationActionForIndexPath:indexPath];
+            } else if (self.celloPrefs.popActionType == SWCello_ActionType_PlayNext) {
+                [self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
+            } else if (self.celloPrefs.popActionType == SWCello_ActionType_AddToUpNext) {
+                [self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
+            } else if (self.celloPrefs.popActionType == SWCello_ActionType_AddToPlaylist) {
+                [self performAddToPlaylistActionForIndexPath:indexPath];
+            } else if (self.celloPrefs.popActionType == SWCello_ActionType_ToggleKeepLocal) {
+                [self performDownloadActionForIndexPath:indexPath];
+            } else if (self.celloPrefs.popActionType == SWCello_ActionType_Delete) {
+                UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
+                [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
+            }
+            
         }
         
-    } else {
-        
-        if (self.celloPrefs.popActionType == SWCello_ActionType_ShowInStore) {
-            [self performShowInStoreActionForIndexPath:indexPath];
-        } else if (self.celloPrefs.popActionType == SWCello_ActionType_StartRadioStation) {
-            [self performStartStationActionForIndexPath:indexPath];
-        } else if (self.celloPrefs.popActionType == SWCello_ActionType_PlayNext) {
-            [self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
-        } else if (self.celloPrefs.popActionType == SWCello_ActionType_AddToUpNext) {
-            [self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
-        } else if (self.celloPrefs.popActionType == SWCello_ActionType_AddToPlaylist) {
-            [self performAddToPlaylistActionForIndexPath:indexPath];
-        } else if (self.celloPrefs.popActionType == SWCello_ActionType_ToggleKeepLocal) {
-            [self performDownloadActionForIndexPath:indexPath];
-        } else if (self.celloPrefs.popActionType == SWCello_ActionType_Delete) {
-            UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
-            [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
-        }
-        
-    }
+    });
     
     SW_PIRACY;
 }
@@ -318,7 +311,12 @@ handler:nil]; \
         
         NSIndexPath *indexPath = previewViewController.celloPreviewIndexPath;
         
-        if ([key isEqualToString:@"cello_showinstore"]) {
+        
+        if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
+            
+            [self performShowDetailViewControllerActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_showinstore"]) {
             
             [self performShowInStoreActionForIndexPath:indexPath];
             
@@ -363,7 +361,10 @@ handler:nil]; \
 {
     UIColor *color;
     //TEMPORARY
-    if ([key isEqualToString:@"cello_showinstore"]) {
+    if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
+        title = @"Detail";
+        color = [UIColor purpleColor];
+    } else if ([key isEqualToString:@"cello_showinstore"]) {
         title = @"Store";
         color = [UIColor orangeColor];
     } else if ([key isEqualToString:@"cello_startradiostation"]) {
@@ -390,7 +391,11 @@ handler:nil]; \
     
     id handler = ^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         
-        if ([key isEqualToString:@"cello_showinstore"]) {
+        if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
+            
+            [self performShowDetailViewControllerActionForIndexPath:indexPath];
+            
+        } else if ([key isEqualToString:@"cello_showinstore"]) {
             
             [self performShowInStoreActionForIndexPath:indexPath];
             
@@ -435,6 +440,22 @@ handler:nil]; \
 }
 
 #pragma mark - Actions(Perform)
+
+- (void)performShowDetailViewControllerActionForIndexPath:(NSIndexPath *)indexPath
+{
+    MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+    
+    UIViewController *previewViewController = [self.delegate.libraryViewConfiguration
+                                               previewViewControllerForEntityValueContext:valueContext
+                                               fromViewController:self.delegate];
+    
+    if ([previewViewController isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) { // Simulate tapping on the header
+        [self.delegate.libraryViewConfiguration handleSelectionOfEntityValueContext:valueContext fromViewController:self.delegate];
+    } else {
+        [self.delegate.navigationController pushViewController:previewViewController animated:YES];
+    }
+}
+
 
 - (void)performShowInStoreActionForIndexPath:(NSIndexPath *)indexPath
 {

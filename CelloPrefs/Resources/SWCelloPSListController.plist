@@ -19,7 +19,7 @@
 			<integer>0</integer>
 			<key>validTitles</key>
 			<array>
-				<string>Push View Controller</string>
+				<string>Show Detail View Controller</string>
 				<string>Show in iTunes Store</string>
 				<string>Start Radio Station</string>
 				<string>Play Next</string>
@@ -99,7 +99,14 @@
 					</dict>
 				</array>
 				<key>disabled</key>
-				<array/>
+				<array>
+					<dict>
+						<key>key</key>
+						<string>cello_showdetailviewcontroller</string>
+						<key>title</key>
+						<string>Show Detail View Controller</string>
+					</dict>
+				</array>
 			</dict>
 			<key>defaults</key>
 			<string>com.apple.Music</string>
@@ -144,6 +151,12 @@
 				</array>
 				<key>disabled</key>
 				<array>
+					<dict>
+						<key>key</key>
+						<string>cello_showdetailviewcontroller</string>
+						<key>title</key>
+						<string>Show Detail View Controller</string>
+					</dict>
 					<dict>
 						<key>key</key>
 						<string>cello_showinstore</string>

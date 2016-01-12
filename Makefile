@@ -5,7 +5,7 @@
 
 FINALPACKAGE = 1
 DEBUG = 0
-PACKAGE_VERSION = 1.0-5
+PACKAGE_VERSION = 1.0-6
 
 
 
@@ -23,9 +23,9 @@ TARGET = iphone:clang:latest:7.0
 
 
 
-TWEAK_NAME = SWCello
-SWCello_CFLAGS = -fobjc-arc
-SWCello_FILES = MusicCoalescingEntityValueProvider.xm \
+TWEAK_NAME = Cello
+Cello_CFLAGS = -fobjc-arc
+Cello_FILES = MusicCoalescingEntityValueProvider.xm \
                 MusicContextualActionsHeaderViewController.xm \
                 MusicEntityValueContext.xm \
                 MusicLibraryBrowseCollectionViewController.xm \
@@ -39,12 +39,12 @@ SWCello_FILES = MusicCoalescingEntityValueProvider.xm \
                 SWCelloPrefs.xm \
 
 ifeq ($(DEBUG), 1)
-    SWCello_CFLAGS += -Wno-unused-variable
-    SWCello_FILES += SWCelloTest.xm #SWCelloDebug.xm
+    Cello_CFLAGS += -Wno-unused-variable
+    Cello_FILES += SWCelloTest.xm SWCelloDebug.xm
 endif
 
-SWCello_FRAMEWORKS = Foundation UIKit MediaPlayer
-SWCello_LIBRARIES = substrate sw packageinfo MobileGestalt
+Cello_FRAMEWORKS = Foundation UIKit MediaPlayer
+Cello_LIBRARIES = substrate sw packageinfo MobileGestalt
 
 ADDITIONAL_CFLAGS = -Ipublic
 

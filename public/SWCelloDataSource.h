@@ -36,6 +36,7 @@
 - (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title;
 - (UITableViewRowAction *)tableViewRowActionForKey:(NSString *)key title:(NSString *)title;
 
+- (void)performShowDetailViewControllerActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performShowInStoreActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performStartStationActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performUpNextAction:(SWCello_UpNextActionType)actionType forIndexPath:(NSIndexPath *)indexPath;

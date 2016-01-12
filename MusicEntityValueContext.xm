@@ -18,7 +18,9 @@
 %new
 - (BOOL)cello_isActionAvailableForKey:(NSString *)key
 {
-    if ([key isEqualToString:@"cello_showinstore"]) {
+    if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
+        return YES;
+    } else if ([key isEqualToString:@"cello_showinstore"]) {
         return [self cello_showInStoreAvailable];
     } else if ([key isEqualToString:@"cello_startradiostation"]) {
         return [self cello_startRadioStationAvailable];

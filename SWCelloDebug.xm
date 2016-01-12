@@ -6,7 +6,7 @@
 //
 //
 
-#import "MusicMediaEntityProvider+SW.h"
+#import <FuseUI/MusicMediaEntityProvider.h>
 #import "MusicEntityValueContext+SW.h"
 
 // TODO: MOVE TO libsluthware
@@ -364,6 +364,42 @@ completion:(/*^block*/id)arg6
     NSLog(@"arg1:[%@]", arg1);
     NSLog(@"arg2:[%@]", arg2);
     LOG_METHOD_END
+}
+
+%end
+
+
+
+
+
+%hook MusicLibraryArtistsViewConfiguration
+
+- (long long)handleSelectionOfEntityValueContext:(id)arg1 fromViewController:(id)arg2
+{
+    long long orig = %orig(arg1, arg2);
+    
+    LOG_METHOD_START
+    NSLog(@"arg1:[%@]", arg1);
+    NSLog(@"arg2:[%@]", arg2);
+    NSLog(@"retunVal:[%@]", @(orig));
+    LOG_METHOD_END
+    
+    return orig;
+}
+
+- (long long)handleSelectionFromUserActivityContext:(id)arg1 containerItem:(id)arg2 entityValueContext:(id)arg3 viewController:(id)arg4
+{
+    long long orig = %orig(arg1, arg2, arg3, arg4);
+    
+    LOG_METHOD_START
+    NSLog(@"arg1:[%@]", arg1);
+    NSLog(@"arg2:[%@]", arg2);
+    NSLog(@"arg2:[%@]", arg3);
+    NSLog(@"arg2:[%@]", arg4);
+    NSLog(@"retunVal:[%@]", @(orig));
+    LOG_METHOD_END
+    
+    return orig;
 }
 
 %end
