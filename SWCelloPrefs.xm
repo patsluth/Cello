@@ -8,9 +8,6 @@
 
 #import "SWCelloPrefs.h"
 
-#define PREFS_DEFAULTS_PATH @"/Library/PreferenceBundles/CelloPrefs.bundle"
-#define PREFS_APPLICATION CFSTR("com.apple.Music")
-
 
 
 
@@ -46,14 +43,17 @@
 
 - (void)refreshPrefs
 {
-    self.popActionType = (SWCello_ActionType)CFPreferencesGetAppIntegerValue(CFSTR("cello_popaction_type"), PREFS_APPLICATION, nil);
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.patsluth.cello.plist"];
     
     
-    NSDictionary *peekPrefs = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("cello_contextual_actions_peek"), PREFS_APPLICATION));
+    self.popActionType = (SWCello_ActionType)[[prefs valueForKey:@"cello_popaction_type"] integerValue];
+    
+    
+    NSDictionary *peekPrefs = [prefs valueForKey:@"cello_contextual_actions_peek"];
     self.contextualActionsPeek = [peekPrefs valueForKey:@"enabled"];
     
     
-    NSDictionary *slidePrefs = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("cello_contextual_actions_slide"), PREFS_APPLICATION));
+    NSDictionary *slidePrefs = [prefs valueForKey:@"cello_contextual_actions_slide"];
     self.contextualActionsSlide = [slidePrefs valueForKey:@"enabled"];
     
 }
@@ -65,26 +65,30 @@
 
 %ctor //syncronize cello default prefs
 {
-    NSBundle *bundle = [NSBundle bundleWithPath:PREFS_DEFAULTS_PATH];
-    NSDictionary *prefsDefaults = [NSDictionary dictionaryWithContentsOfFile:[bundle pathForResource:@"prefsDefaults" ofType:@".plist"]];
+    NSBundle *bundle = [NSBundle bundleWithPath:@"/Library/PreferenceBundles/CelloPrefs.bundle"];
+    
+    NSString *prefsDefaultsPath = [bundle pathForResource:@"prefsDefaults" ofType:@".plist"];
+    NSString *prefsPath = @"/User/Library/Preferences/com.patsluth.cello.plist";
+    
+    NSDictionary *prefsDefaults = [NSDictionary dictionaryWithContentsOfFile:prefsDefaultsPath];
+    NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[NSDictionary dictionaryWithContentsOfFile:prefsPath]];
     
     for (NSString *key in prefsDefaults) {
         
-        id currentValue = (id)CFBridgingRelease(CFPreferencesCopyAppValue((__bridge CFStringRef)key, PREFS_APPLICATION));
-        
-        if (currentValue == nil) { //dont overwrite
+        if ([prefs valueForKey:key] == nil) { // update value, dont overwrite
+            
+            [prefs setValue:[prefsDefaults valueForKey:key] forKey:key];
             CFPreferencesSetAppValue((__bridge CFStringRef)key,
                                      (__bridge CFPropertyListRef)[prefsDefaults valueForKey:key],
-                                     PREFS_APPLICATION);
+                                     CFSTR("com.patsluth.cello"));
             
         }
         
-        
     }
     
-    //syncronize so we can read right away
-    CFPreferencesAppSynchronize(PREFS_APPLICATION);
-    
+    // syncronize so we can read right away
+    [prefs writeToFile:prefsPath atomically:NO];
+    CFPreferencesAppSynchronize(CFSTR("com.patsluth.cello"));
 }
 
 

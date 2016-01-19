@@ -40,7 +40,7 @@
 				<integer>7</integer>
 			</array>
 			<key>defaults</key>
-			<string>com.apple.Music</string>
+			<string>com.patsluth.cello</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -109,7 +109,7 @@
 				</array>
 			</dict>
 			<key>defaults</key>
-			<string>com.apple.Music</string>
+			<string>com.patsluth.cello</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -178,7 +178,7 @@
 				</array>
 			</dict>
 			<key>defaults</key>
-			<string>com.apple.Music</string>
+			<string>com.patsluth.cello</string>
 		</dict>
 		<dict>
 			<key>cell</key>

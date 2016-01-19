@@ -8,36 +8,22 @@
 
 /* Begin PBXFileReference section */
 		2E0E248E1C41B27800CD2E7B /* SWCelloContextualActionsPSViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SWCelloContextualActionsPSViewController.mm; sourceTree = "<group>"; };
-		2E0E248F1C41BCA400CD2E7B /* prefsDefaults.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = prefsDefaults.plist; sourceTree = "<group>"; };
 		2E25F2361C2F2C8300A38C5E /* entry.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = entry.plist; sourceTree = "<group>"; };
 		2E25F2371C2F2C8300A38C5E /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		2E25F2391C2F2C8300A38C5E /* Developer_Twitter_Profile.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Developer_Twitter_Profile.jpeg; sourceTree = "<group>"; };
-		2E25F23A1C2F2C8300A38C5E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2E25F23C1C2F2C8300A38C5E /* SWCelloPSListController.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SWCelloPSListController.plist; sourceTree = "<group>"; };
 		2E25F23D1C2F2C8300A38C5E /* SWCelloPSListController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SWCelloPSListController.mm; sourceTree = "<group>"; };
+		2EE37A4A1C459B4200907D5A /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		2E25F22E1C2F236800A38C5E = {
 			isa = PBXGroup;
 			children = (
+				2EE37A4A1C459B4200907D5A /* Resources */,
 				2E25F2361C2F2C8300A38C5E /* entry.plist */,
 				2E25F2371C2F2C8300A38C5E /* Makefile */,
-				2E25F2381C2F2C8300A38C5E /* Resources */,
 				2E0E248E1C41B27800CD2E7B /* SWCelloContextualActionsPSViewController.mm */,
 				2E25F23D1C2F2C8300A38C5E /* SWCelloPSListController.mm */,
 			);
-			sourceTree = "<group>";
-		};
-		2E25F2381C2F2C8300A38C5E /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				2E0E248F1C41BCA400CD2E7B /* prefsDefaults.plist */,
-				2E25F2391C2F2C8300A38C5E /* Developer_Twitter_Profile.jpeg */,
-				2E25F23A1C2F2C8300A38C5E /* Info.plist */,
-				2E25F23C1C2F2C8300A38C5E /* SWCelloPSListController.plist */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
