@@ -217,7 +217,7 @@
 			<key>secondaryText</key>
 			<string>Developer</string>
 			<key>imagePath</key>
-			<string>/Library/PreferenceBundles/AcapellaPrefs2.bundle/Developer_Twitter_Profile.jpeg</string>
+			<string>/Library/PreferenceBundles/CelloPrefs.bundle/Developer_Twitter_Profile.jpeg</string>
 			<key>action</key>
 			<string>viewTwitterProfile:</string>
 			<key>height</key>

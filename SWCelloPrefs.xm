@@ -30,66 +30,51 @@
 
 @implementation SWCelloPrefs
 
+#pragma mark - Init
+
 - (id)init
 {
-    self = [super init];
-    
-    if (self) {
-        [self refreshPrefs];
-    }
-    
-    return self;
+	NSBundle *bundle = [NSBundle bundleWithPath:@"/Library/PreferenceBundles/CelloPrefs.bundle"];
+	NSString *preferencePath = @"/var/mobile/Library/Preferences/com.patsluth.cello.plist";
+	NSString *defaultsPath = [bundle pathForResource:@"prefsDefaults" ofType:@".plist"];
+	
+	self = [super initWithPreferenceFilePath:preferencePath
+								defaultsPath:defaultsPath
+								 application:@"com.patsluth.cello"];
+	
+	if (self) {
+	}
+	
+	return self;
 }
+
+- (void)initialize
+{
+	self.popActionType = SWCello_ActionType_PushViewController;
+	
+	self.contextualActionsPeek = @[];
+	self.contextualActionsSlide = @[];
+}
+
+#pragma mark - SWPrefs
 
 - (void)refreshPrefs
 {
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.patsluth.cello.plist"];
+	[super refreshPrefs];
+	
+    self.popActionType = (SWCello_ActionType)[[self.preferences valueForKey:@"cello_popaction_type"] integerValue];
     
     
-    self.popActionType = (SWCello_ActionType)[[prefs valueForKey:@"cello_popaction_type"] integerValue];
-    
-    
-    NSDictionary *peekPrefs = [prefs valueForKey:@"cello_contextual_actions_peek"];
+    NSDictionary *peekPrefs = [self.preferences valueForKey:@"cello_contextual_actions_peek"];
     self.contextualActionsPeek = [peekPrefs valueForKey:@"enabled"];
     
     
-    NSDictionary *slidePrefs = [prefs valueForKey:@"cello_contextual_actions_slide"];
+    NSDictionary *slidePrefs = [self.preferences valueForKey:@"cello_contextual_actions_slide"];
     self.contextualActionsSlide = [slidePrefs valueForKey:@"enabled"];
     
 }
 
 @end
-
-
-
-
-%ctor //syncronize cello default prefs
-{
-    NSBundle *bundle = [NSBundle bundleWithPath:@"/Library/PreferenceBundles/CelloPrefs.bundle"];
-    
-    NSString *prefsDefaultsPath = [bundle pathForResource:@"prefsDefaults" ofType:@".plist"];
-    NSString *prefsPath = @"/User/Library/Preferences/com.patsluth.cello.plist";
-    
-    NSDictionary *prefsDefaults = [NSDictionary dictionaryWithContentsOfFile:prefsDefaultsPath];
-    NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[NSDictionary dictionaryWithContentsOfFile:prefsPath]];
-    
-    for (NSString *key in prefsDefaults) {
-        
-        if ([prefs valueForKey:key] == nil) { // update value, dont overwrite
-            
-            [prefs setValue:[prefsDefaults valueForKey:key] forKey:key];
-            CFPreferencesSetAppValue((__bridge CFStringRef)key,
-                                     (__bridge CFPropertyListRef)[prefsDefaults valueForKey:key],
-                                     CFSTR("com.patsluth.cello"));
-            
-        }
-        
-    }
-    
-    // syncronize so we can read right away
-    [prefs writeToFile:prefsPath atomically:NO];
-    CFPreferencesAppSynchronize(CFSTR("com.patsluth.cello"));
-}
 
 
 

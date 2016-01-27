@@ -8,11 +8,13 @@
 
 #import "SWCello.h"
 
+#import "libsw/libSluthware/SWPrefs.h"
 
 
 
 
-@interface SWCelloPrefs : NSObject
+
+@interface SWCelloPrefs : SWPrefs
 {
 }
 
@@ -23,8 +25,6 @@
 //FUTURE
 //@property (strong, nonatomic, readonly) NSArray *contextualActionsSlideLeft;
 //@property (strong, nonatomic, readonly) NSArray *contextualActionsSlideRight;
-
-- (void)refreshPrefs;
 
 @end
 

@@ -103,8 +103,9 @@ handler:nil]; \
     if (self) {
         
         self.delegate = delegate;
-        self.celloPrefs = [[SWCelloPrefs alloc] init];
-        
+		
+		self.celloPrefs = [[SWCelloPrefs alloc] init];
+		
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationWillEnterForeground:)
                                                      name:UIApplicationWillEnterForegroundNotification
