@@ -9,18 +9,13 @@
 #import <FuseUI/MusicMediaEntityProvider.h>
 #import "MusicEntityValueContext+SW.h"
 
-// TODO: MOVE TO libsluthware
-#define LOG_METHOD_START NSLog(@"");NSLog(@"");NSLog(@"****************************************************************"); \
-                         NSLog(@"[%@]", NSStringFromClass([((id)self) class])); \
-                         NSLog(@"%@]", NSStringFromSelector(_cmd)); \
-                         NSLog(@"----------------------------------------------------------------");
-#define LOG_METHOD_END   NSLog(@"****************************************************************");NSLog(@"");NSLog(@"");
+#import "libsw/libSluthware/libSluthware.h"
 
 
 
 
 
-// log details of system media queries for each type of media view controller
+// Log details of system media queries for each type of media view controller
 %hook MusicMediaProfileDetailViewController
 
 - (id)initWithContainerEntityProvider:(id)arg1

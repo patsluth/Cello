@@ -15,8 +15,6 @@
 			<string>Pop Action</string>
 			<key>key</key>
 			<string>cello_popaction_type</string>
-			<key>default</key>
-			<integer>0</integer>
 			<key>validTitles</key>
 			<array>
 				<string>Show Detail View Controller</string>
@@ -51,63 +49,6 @@
 			<string>Peek Contextual Actions</string>
 			<key>key</key>
 			<string>cello_contextual_actions_peek</string>
-			<key>default</key>
-			<dict>
-				<key>enabled</key>
-				<array>
-					<dict>
-						<key>key</key>
-						<string>cello_showinstore</string>
-						<key>title</key>
-						<string>Show In Store</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_startradiostation</string>
-						<key>title</key>
-						<string>Start Radio Station</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_playnext</string>
-						<key>title</key>
-						<string>Play Next</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_addtoupnext</string>
-						<key>title</key>
-						<string>Add To Up Next</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_addtoplaylist</string>
-						<key>title</key>
-						<string>Add to Playlist</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_makeavailableoffline</string>
-						<key>title</key>
-						<string>Make Available Offline</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_deleteremove</string>
-						<key>title</key>
-						<string>Delete</string>
-					</dict>
-				</array>
-				<key>disabled</key>
-				<array>
-					<dict>
-						<key>key</key>
-						<string>cello_showdetailviewcontroller</string>
-						<key>title</key>
-						<string>Show Detail View Controller</string>
-					</dict>
-				</array>
-			</dict>
 			<key>defaults</key>
 			<string>com.patsluth.cello</string>
 		</dict>
@@ -120,63 +61,6 @@
 			<string>Slide Contextual Actions</string>
 			<key>key</key>
 			<string>cello_contextual_actions_slide</string>
-			<key>default</key>
-			<dict>
-				<key>enabled</key>
-				<array>
-					<dict>
-						<key>key</key>
-						<string>cello_playnext</string>
-						<key>title</key>
-						<string>Play Next</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_addtoupnext</string>
-						<key>title</key>
-						<string>Add To Up Next</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_makeavailableoffline</string>
-						<key>title</key>
-						<string>Make Available Offline</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_deleteremove</string>
-						<key>title</key>
-						<string>Delete</string>
-					</dict>
-				</array>
-				<key>disabled</key>
-				<array>
-					<dict>
-						<key>key</key>
-						<string>cello_showdetailviewcontroller</string>
-						<key>title</key>
-						<string>Show Detail View Controller</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_showinstore</string>
-						<key>title</key>
-						<string>Show In Store</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_startradiostation</string>
-						<key>title</key>
-						<string>Start Radio Station</string>
-					</dict>
-					<dict>
-						<key>key</key>
-						<string>cello_addtoplaylist</string>
-						<key>title</key>
-						<string>Add to Playlist</string>
-					</dict>
-				</array>
-			</dict>
 			<key>defaults</key>
 			<string>com.patsluth.cello</string>
 		</dict>

@@ -8,6 +8,8 @@
 
 #import <Preferences/Preferences.h>
 
+#import "libsw/libSluthware/SWPrefs.h"
+
 
 
 
@@ -16,7 +18,7 @@
 {
 }
 
-@property (strong, nonatomic ) NSMutableDictionary *currentValue;
+@property (strong, nonatomic) SWPrefs *prefs;
 
 @end
 
@@ -26,16 +28,31 @@
 
 @implementation SWCelloContextualActionsPSViewController
 
+#pragma mark - Init
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+	
+	self.editing = YES;
+	self.table.editing = YES;
+	[self setEditingButtonHidden:YES animated:NO];
+}
+
 - (id)specifiers
 {
     if (!_specifiers) {
         
         NSMutableArray *celloSpecifiers = [@[] mutableCopy];
-        
-        self.currentValue = [[self.specifier.properties valueForKey:@"value"] mutableCopy];
-        NSArray *enabledActions = [self.currentValue valueForKey:@"enabled"];
-        NSArray *disabledActions = [self.currentValue valueForKey:@"disabled"];
-        
+		
+		
+		// Get current preference value's
+		NSString *key = [self.specifier.properties valueForKey:@"key"];
+		NSDictionary *preferenceValue = [self.prefs.preferences valueForKey:key];
+		NSMutableArray *enabledActions = [[preferenceValue valueForKey:@"enabled"] mutableCopy];
+		NSMutableArray *disabledActions = [[preferenceValue valueForKey:@"disabled"] mutableCopy];
+	
+		
         // Enabled options
         PSSpecifier *enabledGroup = [PSSpecifier groupSpecifierWithName:@"enabled"];
         [celloSpecifiers addObject:enabledGroup];
@@ -80,22 +97,13 @@
 
 #pragma mark - UITableView
 
-- (void)editDoneTapped
-{
-    [super editDoneTapped];
-    
-    NSString *key = [self.specifier.properties valueForKey:@"key"];
-    NSString *defaults = [self.specifier.properties valueForKey:@"defaults"];
-    
-    //update the CFPreferences so we can read them right away
-    CFPreferencesSetAppValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)self.currentValue, (__bridge CFStringRef)defaults);
-    CFPreferencesAppSynchronize((__bridge CFStringRef)defaults);
-}
-
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
 {
-    NSMutableArray *enabledActions = [[self.currentValue valueForKey:@"enabled"] mutableCopy];
-    NSMutableArray *disabledActions = [[self.currentValue valueForKey:@"disabled"] mutableCopy];
+	// Get current preference value's
+	NSString *key = [self.specifier.properties valueForKey:@"key"];
+	NSMutableDictionary *preferenceValue = [[self.prefs.preferences valueForKey:key] mutableCopy];
+    NSMutableArray *enabledActions = [[preferenceValue valueForKey:@"enabled"] mutableCopy];
+    NSMutableArray *disabledActions = [[preferenceValue valueForKey:@"disabled"] mutableCopy];
     
     // Get references to source and destination arrays
     NSMutableArray *sourceArray = (sourceIndexPath.section == 0) ? enabledActions : disabledActions;
@@ -106,9 +114,10 @@
     [sourceArray removeObject:sourceValue];
     [destinationArray insertObject:sourceValue atIndex:destinationIndexPath.row];
     
-    // Update our data source
-    [self.currentValue setValue:[enabledActions copy] forKey:@"enabled"];
-    [self.currentValue setValue:[disabledActions copy] forKey:@"disabled"];
+    // Update data source
+	[preferenceValue setValue:[enabledActions copy] forKey:@"enabled"];
+	[preferenceValue setValue:[disabledActions copy] forKey:@"disabled"];
+	[self.prefs savePreferenceValue:[preferenceValue copy] forKey:key synchronize:YES];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -145,6 +154,28 @@
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return nil;
+}
+
+#pragma mark - SWPrefs
+
+/**
+ *  Lazy Load prefs
+ *
+ *  @return prefs
+ */
+- (SWPrefs *)prefs
+{
+	if (!_prefs) {
+		
+		NSString *preferencePath = @"/var/mobile/Library/Preferences/com.patsluth.cello.plist";
+		NSString *defaultsPath = [self.bundle pathForResource:@"prefsDefaults" ofType:@".plist"];
+		
+		_prefs = [[SWPrefs alloc] initWithPreferenceFilePath:preferencePath
+												defaultsPath:defaultsPath
+												 application:@"com.patsluth.cello"];
+	}
+	
+	return _prefs;
 }
 
 @end
