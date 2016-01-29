@@ -94,9 +94,8 @@
         
         if ([self.presentedViewController isKindOfClass:%c(MusicHUDViewController)]) {
             [(MusicHUDViewController *)self.presentedViewController dismissAnimated:NO completion:nil];
-        } else {
-            return nil;
         }
+		return nil;
     }
     
     
@@ -214,13 +213,15 @@
 {
     MusicEntityValueContext *valueContext = nil;
     
-    if (indexPath.row != -1) { // Row
+//    if (indexPath.row != -1) { // Row
         valueContext = %orig(indexPath);
-    } else { // Header/Footer
-        valueContext = [self _sectionEntityValueContextForIndex:indexPath.section];
-    }
-    
+//    } else { // Header/Footer
+//        valueContext = [self _sectionEntityValueContextForIndex:indexPath.section];
+//    }
+	
     if (valueContext) {
+		
+		//[valueContext resetOutputValues];
         
         // make sure our queries are set up correctly
         valueContext.wantsItemGlobalIndex = YES;
@@ -232,12 +233,12 @@
         valueContext.wantsContainerPlaybackContext = YES;
         
         
-        if (indexPath.row != -1) { // Row
-            [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
-         } else { // Header/Footer
-            [self _configureSectionEntityValueContextOutput:valueContext forIndex:indexPath.section];
-        }
-        
+//        if (indexPath.row != -1) { // Row
+//            [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
+//         } else { // Header/Footer
+//            [self _configureSectionEntityValueContextOutput:valueContext forIndex:indexPath.section];
+//        }
+		
     }
     
     return valueContext;

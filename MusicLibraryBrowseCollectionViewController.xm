@@ -27,13 +27,28 @@
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
-    return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
+	return [self cello_previewingContext:previewingContext viewControllerForLocation:location];
 }
 
 // pop
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
 {
     [self cello_previewingContext:previewingContext commitViewController:viewControllerToCommit];
+}
+
+- (MusicEntityValueContext *)_entityValueContextAtIndexPath:(NSIndexPath *)indexPath
+{
+	MusicEntityValueContext *valueContext = %orig(indexPath);
+	
+	if (valueContext) {
+		
+		// make sure our playback context's are setup correctly
+		valueContext.wantsItemPlaybackContext = YES;
+		valueContext.wantsContainerPlaybackContext = YES;
+		
+	}
+	
+	return valueContext;
 }
 
 %end
@@ -80,15 +95,17 @@
 %new
 - (UIViewController *)cello_previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
-    if (self.presentedViewController) {
-        
-        if ([self.presentedViewController isKindOfClass:%c(MusicHUDViewController)]) {
-            [(MusicHUDViewController *)self.presentedViewController dismissAnimated:NO completion:nil];
-        } else {
-            return nil;
-        }
-    }
-    
+	if (self.presentedViewController) {
+		return nil;
+	}
+	
+	UIViewController *presentedVC = self.view.window.rootViewController.presentedViewController;
+	// The root view controller displays the HUD popup instead of self (Unline MusicLibraryBrowsetableViewController)
+	if (presentedVC && [presentedVC isKindOfClass:%c(MusicHUDViewController)]) {
+		[(MusicHUDViewController *)presentedVC dismissAnimated:NO completion:nil];
+		return nil;
+	}
+
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     
     if ([self.collectionView cellForItemAtIndexPath:indexPath]) {
@@ -114,19 +131,17 @@
 - (MusicEntityValueContext *)_entityValueContextAtIndexPath:(NSIndexPath *)indexPath
 {
     MusicEntityValueContext *valueContext = %orig(indexPath);
-    
-    if (valueContext) {
-        
-        // make sure our queries are set up correctly
-        valueContext.wantsItemGlobalIndex = YES;
-        valueContext.wantsItemEntityValueProvider = YES;
-        valueContext.wantsContainerEntityValueProvider = YES;
-        valueContext.wantsItemIdentifierCollection = YES;
-        valueContext.wantsContainerIdentifierCollection = YES;
-        valueContext.wantsItemPlaybackContext = YES;
-        valueContext.wantsContainerPlaybackContext = YES;
-        
-        [self _configureEntityValueContextOutput:valueContext forIndexPath:indexPath];
+	
+	if (valueContext) {
+		
+		// make sure our queries are set up correctly
+		valueContext.wantsItemGlobalIndex = YES;
+		valueContext.wantsItemEntityValueProvider = YES;
+		valueContext.wantsContainerEntityValueProvider = YES;
+		valueContext.wantsItemIdentifierCollection = YES;
+		valueContext.wantsContainerIdentifierCollection = YES;
+		valueContext.wantsItemPlaybackContext = YES;
+		valueContext.wantsContainerPlaybackContext = YES;
         
     }
     

@@ -8,6 +8,7 @@
 
 #import "SWCelloDataSource.h"
 #import "SWCelloPrefs.h"
+#import "libsw/libSluthware/libSluthware.h"
 
 #import <FuseUI/MusicCoalescingEntityValueProvider.h>
 #import <FuseUI/MusicMediaProductDetailViewController.h>
@@ -197,13 +198,10 @@ handler:nil]; \
     
     NSDate *methodFinish = [NSDate date];
     NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
-    
-    
-    NSLog(@"");NSLog(@"--------------------------------");
-    NSLog(@"%@", NSStringFromClass(self.class));
-    NSLog(@"%@", NSStringFromSelector(_cmd));
-    NSLog(@"executionTime:[%f]", executionTime);
-    NSLog(@"--------------------------------");
+	
+	LOG_METHOD_START
+	NSLog(@"executionTime:[%f]", executionTime);
+	LOG_METHOD_END
     
 #endif
     
@@ -480,8 +478,8 @@ handler:nil]; \
 
 - (void)performUpNextAction:(SWCello_UpNextActionType)actionType forIndexPath:(NSIndexPath *)indexPath
 {
-    MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    
+	MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+	
     MusicContextualUpNextAlertAction *contextAction = [%c(MusicContextualUpNextAlertAction)
                                                        contextualUpNextActionWithEntityValueContext:valueContext
                                                        insertionType:actionType
@@ -631,18 +629,20 @@ handler:nil]; \
                                 [self performDeleteFromLibraryActionForValueContext:tempValueContext];
                                 
                             } else {
-                                NSLog(@"--------------------------------");
-                                NSLog(@"Cello - Error constructing query");
-                                NSLog(@"--------------------------------");
-                                NSLog(@"%@", mediaItem);
-                                NSLog(@"%@", queryPredicate);
-                                NSLog(@"%@", titlesQuery);
-                                NSLog(@"%@", @(titlesQuery.items.count));
-                                NSLog(@"--------------------------------");
+								LOG_METHOD_START
+								NSLog(@"--------------------------------");
+								NSLog(@"Cello - Error constructing query");
+								NSLog(@"--------------------------------");
+								NSLog(@"%@", mediaItem);
+								NSLog(@"%@", queryPredicate);
+								NSLog(@"%@", titlesQuery);
+								NSLog(@"%@", @(titlesQuery.items.count));
+								NSLog(@"--------------------------------");
+								LOG_METHOD_END
                             }
-                            
+							
                         } else {
-                            
+							
                             [self performDeleteFromLibraryActionForValueContext:valueContext];
                             
                         }
