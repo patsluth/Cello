@@ -128,6 +128,23 @@ handler:nil]; \
 
 - (UIViewController<SWCelloMediaEntityPreviewViewController> *)previewViewControllerForIndexPath:(NSIndexPath *)indexPath
 {
+	
+	// Search upwards for the MusicMediaDetailViewController, so we can see if we are in editing mode
+	UIViewController *curParentVC = self.delegate.parentViewController;
+	while (curParentVC) {
+		if ([curParentVC isKindOfClass:%c(MusicMediaDetailViewController)]) { // Found it
+			
+			if (curParentVC.editing) { // Don't allow Cello on editing
+				return nil;
+			}
+			
+			break;
+		}
+		curParentVC = curParentVC.parentViewController;
+	}
+	
+	
+	
 #ifdef DEBUG
     
     NSDate *methodStart = [NSDate date];
