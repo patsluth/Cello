@@ -6,6 +6,8 @@
 //
 //
 
+
+#import <MediaPlayer/MPArtworkCatalog.h>
 #import <FuseUI/MusicMediaEntityProvider.h>
 #import "MusicEntityValueContext+SW.h"
 
@@ -331,7 +333,7 @@ completion:(/*^block*/id)arg6
     LOG_METHOD_END
 }
 
-- (id)initWithArtworkColorAnalysis:(id)arg1
+- (id)initWithArtworkColorAnalysis:(id /* MPMutableArtworkColorAnalysis * */)arg1
 {
     id orig = %orig(arg1);
     
@@ -341,6 +343,49 @@ completion:(/*^block*/id)arg6
     LOG_METHOD_END
     
     return orig;
+}
+
+%end
+
+
+
+
+
+@interface MPArtworkColorAnalyzer : NSObject
+{
+}
+
+@property (nonatomic, readonly) long long algorithm;
+@property (nonatomic, readonly) UIImage *image;
+
+- (id)initWithImage:(id)arg1 algorithm:(long long)arg2;
+- (void)analyzeWithCompletionHandler:(/*^block*/id)arg1;
+- (id)_fallbackColorAnalysis;
+
+@end
+
+%hook MPArtworkColorAnalyzer
+
+- (id)initWithImage:(id)arg1 algorithm:(long long)arg2
+{
+	id orig = %orig(arg1, arg2);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"arg2:[%@]", @(arg2));
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
+
+-(void)analyzeWithCompletionHandler:(/*^block*/id)arg1
+{
+	%orig(arg1);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	LOG_METHOD_END
 }
 
 %end
@@ -362,6 +407,62 @@ completion:(/*^block*/id)arg6
 }
 
 %end
+
+
+
+
+
+%hook MPArtworkCatalog
+
+- (id)initWithToken:(id)arg1 dataSource:(id)arg2
+{
+	id orig = %orig(arg1, arg2);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"arg2:[%@]", arg2);
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
+
++ (id)staticArtworkCatalogWithImage:(id)arg1
+{
+	id orig = %orig(arg1);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
+
+- (void)requestColorAnalysisWithAlgorithm:(int)arg1 completionHandler:(id /* block */)arg2
+{
+	%orig(arg1, arg2);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", @(arg1));
+	NSLog(@"arg2:[%@]", arg2);
+	LOG_METHOD_END
+}
+
+%end
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -396,6 +497,30 @@ completion:(/*^block*/id)arg6
     
     return orig;
 }
+
+%end
+
+
+
+
+
+%hook MusicCoalescingEntityValueProvider
+
+- (id)imageURLForEntityArtworkProperty:(id)arg1 fittingSize:(CGSize)arg2 destinationScale:(CGFloat)arg3
+{
+	id orig = %orig(arg1, arg2, arg3);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"arg2:[%@]", NSStringFromCGSize(arg2));
+	NSLog(@"arg2:[%@]", @(arg3));
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
+
+
 
 %end
 

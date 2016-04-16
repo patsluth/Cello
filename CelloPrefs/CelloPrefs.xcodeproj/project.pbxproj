@@ -32,7 +32,7 @@
 		2E25F22F1C2F236800A38C5E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 			};
 			buildConfigurationList = 2E25F2321C2F236800A38C5E /* Build configuration list for PBXProject "CelloPrefs" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -53,6 +53,8 @@
 		2E25F2331C2F236800A38C5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};

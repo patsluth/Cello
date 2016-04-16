@@ -5,7 +5,7 @@
 
 FINALPACKAGE = 1
 DEBUG = 0
-PACKAGE_VERSION = 1.0-10
+PACKAGE_VERSION = 1.0-11
 
 
 
@@ -44,6 +44,7 @@ ifeq ($(DEBUG), 1)
 endif
 
 Cello_FRAMEWORKS = Foundation UIKit MediaPlayer
+Cello_PRIVATE_FRAMEWORKS = FuseUI
 Cello_LIBRARIES = substrate sw packageinfo MobileGestalt
 
 ADDITIONAL_CFLAGS = -Ipublic

@@ -11,10 +11,13 @@
 #import "libsw/libSluthware/libSluthware.h"
 
 #import <FuseUI/MusicCoalescingEntityValueProvider.h>
-#import <FuseUI/MusicMediaProductDetailViewController.h>
+#import <FuseUI/MusicEntityViewContentTextDescriptor.h>
+
+#import <MediaPlayer/MPArtworkCatalog.h>
+#import <MediaPlayer/MPMutableArtworkColorAnalysis.h>
 
 // Contextual Actions
-#import <FuseUI/MusicContextualActionsHeaderViewController.h>
+#import "MusicContextualActionsHeaderViewController+SW.h"
 // ******************
 #import <FuseUI/MusicContextualShowInStoreAlertAction.h>
 #import <FuseUI/MusicContextualStartStationAlertAction.h>
@@ -85,8 +88,6 @@ handler:nil]; \
 @property (weak, nonatomic, readwrite) UIViewController<SWCelloMusicLibraryBrowseDelegate> *delegate;
 @property (strong, nonatomic, readwrite) SWCelloPrefs *celloPrefs;
 
-//@property (strong, nonatomic) id cachedCommitViewController;
-
 @end
 
 
@@ -124,8 +125,6 @@ handler:nil]; \
 
 #pragma mark - UIViewControllerPreviewing
 
-#define FORCE_CONTEXTUAL_HEADER_AS_PREVIEW
-
 - (UIViewController<SWCelloMediaEntityPreviewViewController> *)previewViewControllerForIndexPath:(NSIndexPath *)indexPath
 {
 	
@@ -150,67 +149,63 @@ handler:nil]; \
     NSDate *methodStart = [NSDate date];
     
 #endif
-    
-    
-    
-    __block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController;
-    
-    
-    
-#ifdef FORCE_CONTEXTUAL_HEADER_AS_PREVIEW
-    
-    // I use the contextual alert header view as a preview for unsopprted media collection types (genre, composer)
-    // This will simulate clicking the contextual action header view, opening the view controller for the collection
-    previewViewController = [[%c(MusicContextualActionsHeaderViewController) alloc]
-                             initWithEntityValueContext:valueContext
-                             contextualActions:nil];
-    previewViewController.view.backgroundColor = [UIColor whiteColor];
-    
-#else 
-    
-    //cello_blockTracklistEntityProver = YES;
-    previewViewController = [self.delegate.libraryViewConfiguration previewViewControllerForEntityValueContext:valueContext
-                                                                                            fromViewController:self.delegate];
-    //cello_blockTracklistEntityProver = NO;
-    
-    // Cut these views down to size to only show the header in the preview
-    if (previewViewController && [previewViewController isKindOfClass:%c(MusicMediaDetailViewController)]) {
-        
-        MusicMediaDetailViewController *mediaDetailViewController = (MusicMediaDetailViewController *)previewViewController;
-        
-        // make sure header view is layed out and set our content size to it's height
-        [mediaDetailViewController.view layoutSubviews];
-        [mediaDetailViewController _updateMaximumHeaderHeight];
-        mediaDetailViewController.preferredContentSize = CGSizeMake(0.0, mediaDetailViewController.maximumHeaderSize.height);
-        
-    }
-    
-#endif
-    
-    
-    
-    previewViewController.celloPreviewIndexPath = indexPath;
+	
+	
+	
+	__block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+	MusicCoalescingEntityValueProvider *coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+	MPArtworkCatalog *artworkCatalog = [coalescingDescriptor valueForEntityProperty:@"musicListArtworkCatalog"];
+
+	
+	
+	MusicContextualActionsHeaderViewController *previewViewController = [[MusicContextualActionsHeaderViewController alloc]
+																		 initWithEntityValueContext:valueContext
+																		 contextualActions:nil];
+	
+	MusicEntityViewContentDescriptor *previewViewControllerContentDescriptor = MSHookIvar<id>(previewViewController, "_contentDescriptor");
+	
+	
+	if (artworkCatalog) {
+		
+		artworkCatalog.fittingSize = CGSizeMake(500, 500);
+		[artworkCatalog requestColorAnalysisWithAlgorithm:0
+										completionHandler:^(MPMutableArtworkColorAnalysis *arg1) {
+											
+											dispatch_async(dispatch_get_main_queue(), ^(void) {
+												previewViewController.view.backgroundColor = arg1.backgroundColor;
+												
+												for (NSUInteger x = 0; x < previewViewControllerContentDescriptor.textDescriptors.count; x++) {
+													
+													MusicEntityViewContentTextDescriptor *textDescriptor = [previewViewControllerContentDescriptor.textDescriptors objectAtIndex:x];
+													
+													// save original alpha so we just modify the color
+													CGFloat originalAlpha = 1.0;
+													CGColorRef colorRef = [textDescriptor.textColor CGColor];
+													if (CGColorGetNumberOfComponents(colorRef) == 4) {
+														originalAlpha = CGColorGetComponents(colorRef)[3];
+													}
+													
+													if (x == 0 || x == 1) {
+														textDescriptor.textColor = [arg1.primaryTextColor colorWithAlphaComponent:originalAlpha];
+													} else {
+														textDescriptor.textColor = [arg1.secondaryTextColor colorWithAlphaComponent:originalAlpha];
+													}
+													
+												}
+												
+											});
+										
+										}];
+		
+	}
+	
+	
+	
+	previewViewController.celloPreviewIndexPath = indexPath;
     previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath actionClass:[UIPreviewAction class]];
-    
-    
-    
-    /*
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul), ^{ // background thread
-        
-        UIViewController *commitViewController = [self.delegate.libraryViewConfiguration
-                                                   previewViewControllerForEntityValueContext:valueContext
-                                                   fromViewController:self.delegate];
-        
-        dispatch_sync(dispatch_get_main_queue(), ^{ // completed
-            self.cachedCommitViewController = commitViewController;
-        });
-    });
-    */
-    
-    
-    
-    
+	
+	
+	
 #ifdef DEBUG
     
     NSDate *methodFinish = [NSDate date];
@@ -229,8 +224,6 @@ handler:nil]; \
      commitViewController:(UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit
 {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        
-        //cello_blockTracklistEntityProver = NO;
         
         NSIndexPath *indexPath = viewControllerToCommit.celloPreviewIndexPath;
         

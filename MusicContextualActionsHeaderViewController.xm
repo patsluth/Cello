@@ -6,7 +6,7 @@
 //
 //
 
-#import <FuseUI/MusicContextualActionsHeaderViewController.h>
+#import "MusicContextualActionsHeaderViewController+SW.h"
 
 
 

@@ -17,8 +17,7 @@
 
 %hook MusicLibraryViewConfiguration
 
-- (id)previewViewControllerForEntityValueContext:(MusicEntityValueContext *)valueContext
-fromViewController:(id<MusicClientContextConsuming>)viewController
+- (id)previewViewControllerForEntityValueContext:(MusicEntityValueContext *)valueContext fromViewController:(id<MusicClientContextConsuming>)viewController
 {
     id orig = %orig(valueContext, viewController);
     
