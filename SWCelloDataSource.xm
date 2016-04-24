@@ -153,21 +153,21 @@ handler:nil]; \
 	
 	
 	__block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-	MusicCoalescingEntityValueProvider *coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+	MusicCoalescingEntityValueProvider *coalescingDescriptor;
+	coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
 	MPArtworkCatalog *artworkCatalog = [coalescingDescriptor valueForEntityProperty:@"musicListArtworkCatalog"];
-
 	
 	
 	MusicContextualActionsHeaderViewController *previewViewController = [[MusicContextualActionsHeaderViewController alloc]
 																		 initWithEntityValueContext:valueContext
 																		 contextualActions:nil];
 	
-	MusicEntityViewContentDescriptor *previewViewControllerContentDescriptor = MSHookIvar<id>(previewViewController, "_contentDescriptor");
-	
 	
 	if (artworkCatalog) {
 		
-		artworkCatalog.fittingSize = CGSizeMake(500, 500);
+		MusicEntityViewContentDescriptor *previewViewControllerContentDescriptor = MSHookIvar<id>(previewViewController, "_contentDescriptor");
+//		artworkCatalog.fittingSize = CGSizeMake(500, 500);
+		
 		[artworkCatalog requestColorAnalysisWithAlgorithm:0
 										completionHandler:^(MPMutableArtworkColorAnalysis *arg1) {
 											
@@ -200,9 +200,8 @@ handler:nil]; \
 	}
 	
 	
-	
 	previewViewController.celloPreviewIndexPath = indexPath;
-    previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath actionClass:[UIPreviewAction class]];
+	previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath actionClass:[UIPreviewAction class]];
 	
 	
 	
@@ -216,7 +215,9 @@ handler:nil]; \
 	LOG_METHOD_END
     
 #endif
-    
+	
+	
+	
     return previewViewController;
 }
 
@@ -261,12 +262,8 @@ handler:nil]; \
 
 - (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath actionClass:(Class)actionClass
 {
-    __block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    id<MusicEntityValueProviding> entityValueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
-    NSMutableArray *actions = [@[] mutableCopy];
     NSArray *enabledActionDataSource; // The preference array for actionClass
-    
-    
+	
     if (actionClass == [UIPreviewAction class]) {
         enabledActionDataSource = self.celloPrefs.contextualActionsPeek;
     } else if (actionClass == [UITableViewRowAction class]) {
@@ -274,50 +271,69 @@ handler:nil]; \
     } else {
         return nil;
     }
-    
-    
-    for (NSDictionary *action in enabledActionDataSource) {
-        
-        NSString *key = [action valueForKey:@"key"];
-        NSString *title = [action valueForKey:@"title"];
-        
-        // Get our action if it is available for key
-        if ([valueContext cello_isActionAvailableForKey:key]) {
-            
-            // Special scenario for make available offline action
-            if ([key isEqualToString:@"cello_makeavailableoffline"]){
-                if ([[entityValueProvider valueForEntityProperty:@"keepLocal"] boolValue]) {
-                    if ([valueContext cello_isConcreteMediaItem]) {
-                        title = @"Remove Download";
-                    } else {
-                        title = @"Remove Downloads";
-                    }
-                }
-            }
-            
-            id previewAction;
-            
-            if (actionClass == [UIPreviewAction class]) {
-                previewAction = [self uipreviewActionForKey:key title:title];
-            } else if (actionClass == [UITableViewRowAction class]) {
-                previewAction = [self tableViewRowActionForKey:key title:title];
-            }
-            
-            if (previewAction) {
-                [actions addObject:previewAction];
-            }
-            
-        }
-        
-    }
-    
+	
+	
+	__block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+	MusicCoalescingEntityValueProvider *coalescingDescriptor;
+	coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+	NSMutableArray *actions = [@[] mutableCopy];
+	
+	
+	if ([coalescingDescriptor.baseEntityValueProvider isKindOfClass:%c(MusicShuffleActionEntityValueProvider)]) {
+
+		if (actionClass == [UIPreviewAction class]) {
+			[actions addObject:[self uipreviewActionForKey:@"cello_makeallavailableoffline" title:@"Make All Available Offline"]];
+		} else if (actionClass == [UITableViewRowAction class]) {
+			[actions addObject:[self tableViewRowActionForKey:@"cello_makeallavailableoffline" title:@"Download All"]];
+		}
+		
+	} else {
+		
+		for (NSDictionary *action in enabledActionDataSource) {
+			
+			NSString *key = [action valueForKey:@"key"];
+			NSString *title = [action valueForKey:@"title"];
+			
+			// Get our action if it is available for key
+			if ([valueContext cello_isActionAvailableForKey:key]) {
+				
+				// Special scenario for make available offline action
+				if ([key isEqualToString:@"cello_makeavailableoffline"]){
+					if ([[coalescingDescriptor valueForEntityProperty:@"keepLocal"] boolValue]) {
+						if ([valueContext cello_isConcreteMediaItem]) {
+							title = @"Remove Download";
+						} else {
+							title = @"Remove Downloads";
+						}
+					}
+				}
+				
+				id previewAction;
+				
+				if (actionClass == [UIPreviewAction class]) {
+					previewAction = [self uipreviewActionForKey:key title:title];
+				} else if (actionClass == [UITableViewRowAction class]) {
+					previewAction = [self tableViewRowActionForKey:key title:title];
+				}
+				
+				if (previewAction) {
+					[actions addObject:previewAction];
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	
     return [actions copy];
 }
 
 - (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title
 {
     id handler = ^(UIPreviewAction *action, UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController) {
-        
+		
         NSIndexPath *indexPath = previewViewController.celloPreviewIndexPath;
         
         
@@ -349,15 +365,21 @@ handler:nil]; \
             
             [self performDownloadActionForIndexPath:indexPath];
             
-        } else if ([key isEqualToString:@"cello_deleteremove"]) {
+		} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
+			
+			[self performDownloadAllActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_deleteremove"]) {
             
             UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
             [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
             
         }
+		
         
         SW_PIRACY;
-        
+		
+		
     };
     
     UIPreviewAction *previewAction = [UIPreviewAction actionWithTitle:title
@@ -391,7 +413,10 @@ handler:nil]; \
     } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
         title = @"Download";
         color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
-    } else if ([key isEqualToString:@"cello_deleteremove"]) {
+	} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
+		title = @"Download All";
+		color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
+	}  else if ([key isEqualToString:@"cello_deleteremove"]) {
         title = @"Delete";
         color = [UIColor redColor];
     }
@@ -428,7 +453,11 @@ handler:nil]; \
             
             [self performDownloadActionForIndexPath:indexPath];
             
-        } else if ([key isEqualToString:@"cello_deleteremove"]) {
+		} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
+			
+			[self performDownloadAllActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_deleteremove"]) {
             
             UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
             [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
@@ -518,7 +547,7 @@ handler:nil]; \
 
 - (void)performDownloadActionForIndexPath:(NSIndexPath *)indexPath
 {
-    MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+	MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
     
     MusicContextualLibraryUpdateAlertAction *contextAction;
     [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:nil
@@ -529,6 +558,71 @@ handler:nil]; \
                                                        additionalPresentationHandler:nil
                                                                    didDismissHandler:nil];
     [contextAction performContextualAction];
+}
+
+- (void)performDownloadAllActionForIndexPath:(NSIndexPath *)indexPath
+{
+	if ([self.delegate respondsToSelector:@selector(tableView)]) {
+		
+		UITableView *tableView = [self.delegate valueForKey:@"tableView"];
+		NSMutableArray *indexPaths = [NSMutableArray new];
+		
+		for (NSUInteger section = 0; section < tableView.numberOfSections; section += 1) {
+			for (NSUInteger row = 0; row < [tableView numberOfRowsInSection:section]; row += 1) {
+				
+				[indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:section]];
+				
+			}
+		}
+		
+		[self _performDownloadAllActionForIndexPathRecursive:@{ @"tableView" : tableView,  @"indexPaths" : indexPaths  }];
+		
+	}
+}
+
+/**
+ *  Recusively download item's which are not downloaded with a delay
+ *
+ *  @param NSDictioary with keys @"tableView" = UITableView and @"indexPaths" = NSMutableArray<NSIndexPath *>
+ */
+- (void)_performDownloadAllActionForIndexPathRecursive:(NSDictionary *)arg1
+{
+	UITableView *tableView = arg1[@"tableView"];
+	NSMutableArray<NSIndexPath *> *indexPaths = arg1[@"indexPaths"];
+	
+	if (tableView) {
+		
+		// we have items and user is not scrolling
+		if (indexPaths.count > 0 && tableView.panGestureRecognizer.state == UIGestureRecognizerStatePossible) {
+			
+			NSIndexPath *indexPath = [indexPaths firstObject];
+			[indexPaths removeObject:indexPath];
+			arg1 = @{ @"tableView" : tableView, @"indexPaths" : indexPaths };
+			
+			// Scroll to current index path so we can access it's data
+			[tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+			MusicCoalescingEntityValueProvider *coalescingDescriptor;
+			coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+			
+			if (coalescingDescriptor && ![[coalescingDescriptor valueForEntityProperty:@"keepLocal"] boolValue]) { // This item is already downloaded
+				
+				[self performDownloadActionForIndexPath:indexPath];
+				[self performSelector:_cmd withObject:arg1 afterDelay:1.0 inModes:@[NSRunLoopCommonModes]]; // Run while tableView is dragging
+				
+			} else {
+				
+				[self _performDownloadAllActionForIndexPathRecursive:arg1];
+				
+			}
+			
+		} else {
+			
+			[NSObject cancelPreviousPerformRequestsWithTarget:self];
+			
+		}
+		
+	}
+	
 }
 
 - (void)performRemoveFromPlaylistActionForIndexPath:(NSIndexPath *)indexPath

@@ -5,7 +5,7 @@
 
 FINALPACKAGE = 1
 DEBUG = 0
-PACKAGE_VERSION = 1.0-11
+PACKAGE_VERSION = 1.0-12
 
 
 
@@ -40,7 +40,7 @@ Cello_FILES = MusicCoalescingEntityValueProvider.xm \
 
 ifeq ($(DEBUG), 1)
     Cello_CFLAGS += -Wno-unused-variable
-    Cello_FILES += SWCelloTest.xm SWCelloDebug.xm
+#Cello_FILES += SWCelloTest.xm SWCelloDebug.xm
 endif
 
 Cello_FRAMEWORKS = Foundation UIKit MediaPlayer

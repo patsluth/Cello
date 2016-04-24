@@ -21,7 +21,8 @@
     // this will happen for all media types (artist, song, playlist) and all the names
     // values have different keys
     NSString *itemName = @"";
-    for (NSString *propertyKey in [self _cachedPropertyValues]) {
+	
+	for (NSString *propertyKey in [self _cachedPropertyValues]) {
         
         if ([propertyKey.lowercaseString containsString:@"name"] ||
             [propertyKey.lowercaseString containsString:@"title"]) {

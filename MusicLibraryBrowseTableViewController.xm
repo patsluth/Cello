@@ -271,7 +271,8 @@
 %new
 - (void)setCelloDataSource:(SWCelloDataSource *)celloDataSource
 {
-    if (celloDataSource == nil && self.celloDataSource) { // clean up notifications
+	if (celloDataSource == nil && self.celloDataSource) { // clean up notifications
+		[NSObject cancelPreviousPerformRequestsWithTarget:self.celloDataSource];
         [[NSNotificationCenter defaultCenter] removeObserver:self.celloDataSource];
     }
     

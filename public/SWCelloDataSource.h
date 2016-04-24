@@ -42,6 +42,7 @@
 - (void)performUpNextAction:(SWCello_UpNextActionType)actionType forIndexPath:(NSIndexPath *)indexPath;
 - (void)performAddToPlaylistActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performDownloadActionForIndexPath:(NSIndexPath *)indexPath;
+- (void)performDownloadAllActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performRemoveFromPlaylistActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performDeleteFromLibraryActionForValueContext:(MusicEntityValueContext *)valueContext;
 - (UIAlertController *)deleteConfirmationAlertControllerForIndexPath:(NSIndexPath *)indexPath;

@@ -9,7 +9,7 @@
 /* Begin PBXFileReference section */
 		2E0CB1661C34504E0059D1CF /* SWCelloTest.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloTest.xm; sourceTree = "<group>"; };
 		2E0CB1671C34639A0059D1CF /* MusicLibraryBrowseCollectionViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryBrowseCollectionViewController.xm; sourceTree = "<group>"; };
-		2E44347D1CC1B35B007FFC7F /* Cello.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Cello.app; path = "/Users/patsluth/Development/jailbreak_workspace/Cello/build/Debug-iphoneos/Cello.app"; sourceTree = "<absolute>"; };
+		2E6A6E2B1CCC7A310037CAD3 /* CelloTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = CelloTests.xctest; path = "/Users/patsluth/Development/jailbreak_workspace/Cello/build/Debug-iphoneos/CelloTests.xctest"; sourceTree = "<absolute>"; };
 		2E6EAA121C35726F0050B13A /* SWCelloDataSource.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloDataSource.xm; sourceTree = "<group>"; };
 		2E6EAA131C358DBF0050B13A /* MusicLibrarySongsViewConfiguration.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibrarySongsViewConfiguration.xm; sourceTree = "<group>"; };
 		2E6EAA141C3598880050B13A /* MusicLibraryGenresViewConfiguration.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryGenresViewConfiguration.xm; sourceTree = "<group>"; };
@@ -28,7 +28,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		2E4434621CC1B05B007FFC7F /* Frameworks */ = {
+		2E5E518B1CC3F09D004DB6FF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -64,22 +64,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2E4434641CC1B05B007FFC7F /* Cello */ = {
+		2E5E518D1CC3F09D004DB6FF /* CelloTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2E44347C1CC1B05B007FFC7F /* Build configuration list for PBXNativeTarget "Cello" */;
+			buildConfigurationList = 2E5E51931CC3F09D004DB6FF /* Build configuration list for PBXNativeTarget "CelloTests" */;
 			buildPhases = (
-				2E4434611CC1B05B007FFC7F /* Sources */,
-				2E4434621CC1B05B007FFC7F /* Frameworks */,
-				2E4434631CC1B05B007FFC7F /* Resources */,
+				2E5E518A1CC3F09D004DB6FF /* Sources */,
+				2E5E518B1CC3F09D004DB6FF /* Frameworks */,
+				2E5E518C1CC3F09D004DB6FF /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Cello;
-			productName = Cello;
-			productReference = 2E44347D1CC1B35B007FFC7F /* Cello.app */;
-			productType = "com.apple.product-type.application";
+			name = CelloTests;
+			productName = CelloTests;
+			productReference = 2E6A6E2B1CCC7A310037CAD3 /* CelloTests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -89,7 +89,7 @@
 			attributes = {
 				LastUpgradeCheck = 0730;
 				TargetAttributes = {
-					2E4434641CC1B05B007FFC7F = {
+					2E5E518D1CC3F09D004DB6FF = {
 						CreatedOnToolsVersion = 7.3;
 					};
 				};
@@ -107,13 +107,13 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2E4434641CC1B05B007FFC7F /* Cello */,
+				2E5E518D1CC3F09D004DB6FF /* CelloTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		2E4434631CC1B05B007FFC7F /* Resources */ = {
+		2E5E518C1CC3F09D004DB6FF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -123,7 +123,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		2E4434611CC1B05B007FFC7F /* Sources */ = {
+		2E5E518A1CC3F09D004DB6FF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -133,7 +133,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		2E44347A1CC1B05B007FFC7F /* Debug */ = {
+		2E5E51941CC3F09D004DB6FF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -169,18 +169,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Cello/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				INFOPLIST_FILE = CelloTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.patsluth.Cello;
+				PRODUCT_BUNDLE_IDENTIFIER = com.patsluth.CelloTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		2E44347B1CC1B05B007FFC7F /* Release */ = {
+		2E5E51951CC3F09D004DB6FF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -211,14 +210,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Cello/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				INFOPLIST_FILE = CelloTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.patsluth.Cello;
+				PRODUCT_BUNDLE_IDENTIFIER = com.patsluth.CelloTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -227,6 +225,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
@@ -234,17 +233,18 @@
 		2EBB75751BE97BB900A3A82D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2E44347C1CC1B05B007FFC7F /* Build configuration list for PBXNativeTarget "Cello" */ = {
+		2E5E51931CC3F09D004DB6FF /* Build configuration list for PBXNativeTarget "CelloTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2E44347A1CC1B05B007FFC7F /* Debug */,
-				2E44347B1CC1B05B007FFC7F /* Release */,
+				2E5E51941CC3F09D004DB6FF /* Debug */,
+				2E5E51951CC3F09D004DB6FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
