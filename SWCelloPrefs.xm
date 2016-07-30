@@ -16,11 +16,7 @@
 }
 
 @property (nonatomic, readwrite) SWCello_ActionType popActionType;
-
 @property (strong, nonatomic, readwrite) NSArray *contextualActionsPeek;
-@property (strong, nonatomic, readwrite) NSArray *contextualActionsSlide;
-//@property (strong, nonatomic, readwrite) NSArray *contextualActionsSlideLeft;
-//@property (strong, nonatomic, readwrite) NSArray *contextualActionsSlideRight;
 
 @end
 
@@ -53,7 +49,6 @@
 	self.popActionType = SWCello_ActionType_PushViewController;
 	
 	self.contextualActionsPeek = @[];
-	self.contextualActionsSlide = @[];
 }
 
 #pragma mark - SWPrefs
@@ -63,15 +58,10 @@
 	[super refreshPrefs];
 	
     self.popActionType = (SWCello_ActionType)[[self.preferences valueForKey:@"cello_popaction_type"] integerValue];
-    
-    
+	
     NSDictionary *peekPrefs = [self.preferences valueForKey:@"cello_contextual_actions_peek"];
     self.contextualActionsPeek = [peekPrefs valueForKey:@"enabled"];
-    
-    
-    NSDictionary *slidePrefs = [self.preferences valueForKey:@"cello_contextual_actions_slide"];
-    self.contextualActionsSlide = [slidePrefs valueForKey:@"enabled"];
-    
+	
 }
 
 @end

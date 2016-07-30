@@ -13,9 +13,8 @@
 #import <MediaPlayer/MPArtworkCatalog.h>
 #import <MediaPlayer/MPMutableArtworkColorAnalysis.h>
 
-// Contextual Actions
 #import "MusicContextualActionsHeaderViewController+SW.h"
-// ******************
+
 #import <FuseUI/MusicContextualShowInStoreAlertAction.h>
 #import <FuseUI/MusicContextualStartStationAlertAction.h>
 #import <FuseUI/MusicContextualUpNextAlertAction.h>
@@ -23,7 +22,8 @@
 #import <FuseUI/MusicContextualLibraryUpdateAlertAction.h>
 #import <FuseUI/MusicContextualRemoveFromPlaylistAlertAction.h>
 #import <FuseUI/MusicContextualPlaylistPickerViewController.h>
-// ******************
+#import <FuseUI/MusicLibraryActionsCoordinator.h>
+#import <FuseUI/MusicLibraryActionKeepLocalOperation.h>
 
 #import "MusicEntityValueContext+SW.h"
 #import "MusicMediaDetailViewController+SW.h"
@@ -88,47 +88,6 @@ handler:nil]; \
 @property (strong, nonatomic, readwrite) SWCelloPrefs *celloPrefs;
 
 @end
-
-
-
-
-
-
-
-
-// TODO: MOVE
-@interface MusicLibraryActionsCoordinator : NSObject
-{
-}
-
-+ (id)sharedCoordinator;
-
-- (void)_postInvalidationNotification;
-- (void)addOperations:(id)arg1;
-- (id)libraryActionPendingValuesForIdentifierCollection:(id)arg1;
-
-@end
-
-@interface MusicLibraryActionKeepLocalOperation : NSOperation
-{
-}
-
-@property (readonly, copy) MPUContentItemIdentifierCollection *contentItemIdentifierCollection;
-@property (readonly) NSInteger keepLocalValue;
-
-- (id)contentItemIdentifierCollection;
-- (id)initWithContentItemIdentifierCollection:(id)arg1 keepLocalValue:(NSInteger)arg2;
-- (NSInteger)keepLocalValue;
-
-@end
-
-
-
-
-
-
-
-
 
 
 
@@ -241,7 +200,7 @@ handler:nil]; \
 	
 	
 	previewViewController.celloPreviewIndexPath = indexPath;
-	previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath actionClass:[UIPreviewAction class]];
+	previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath];
 	
 	
 	
@@ -300,18 +259,9 @@ handler:nil]; \
 
 #pragma mark - Actions(Instantiate)
 
-- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath actionClass:(Class)actionClass
+- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath
 {
-    NSArray *enabledActionDataSource; // The preference array for actionClass
-	
-    if (actionClass == [UIPreviewAction class]) {
-        enabledActionDataSource = self.celloPrefs.contextualActionsPeek;
-    } else if (actionClass == [UITableViewRowAction class]) {
-        enabledActionDataSource = self.celloPrefs.contextualActionsSlide;
-    } else {
-        return nil;
-    }
-	
+	NSArray *enabledActionDataSource = self.celloPrefs.contextualActionsPeek;
 	
 	__block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
 	id<MusicEntityValueProviding> valueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
@@ -342,13 +292,7 @@ handler:nil]; \
 					
 				}
 				
-				id previewAction;
-				
-				if (actionClass == [UIPreviewAction class]) {
-					previewAction = [self uipreviewActionForKey:key title:title];
-				} else if (actionClass == [UITableViewRowAction class]) {
-					previewAction = [self tableViewRowActionForKey:key title:title];
-				}
+				id previewAction = [self uipreviewActionForKey:key title:title];
 				
 				if (previewAction) {
 					[actions addObject:previewAction];
@@ -366,10 +310,10 @@ handler:nil]; \
 
 - (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title
 {
-    id handler = ^(UIPreviewAction *action, UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController) {
+    id handler = ^(UIPreviewAction *action,
+				   UIViewController<SWCelloMediaEntityPreviewViewController> *previewViewController) {
 		
         NSIndexPath *indexPath = previewViewController.celloPreviewIndexPath;
-        
         
         if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
             
@@ -416,91 +360,6 @@ handler:nil]; \
                                                                 style:UIPreviewActionStyleDefault
                                                               handler:handler];
     return previewAction;
-}
-
-- (UITableViewRowAction *)tableViewRowActionForKey:(NSString *)key title:(NSString *)title
-{
-    UIColor *color;
-    //TEMPORARY
-    if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
-        title = @"Detail";
-        color = [UIColor purpleColor];
-    } else if ([key isEqualToString:@"cello_showinstore"]) {
-        title = @"Store";
-        color = [UIColor orangeColor];
-    } else if ([key isEqualToString:@"cello_startradiostation"]) {
-        title = @"Radio";
-        color = [UIColor greenColor];
-    } else if ([key isEqualToString:@"cello_playnext"]) {
-        title = @"Play\nNext";
-        color = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
-    } else if ([key isEqualToString:@"cello_addtoupnext"]) {
-        title = @"Queue";
-        color = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
-    }  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
-        title = @"+\nPlaylist";
-        color = [UIColor cyanColor];
-    } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
-        title = @"Download";
-        color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
-	} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
-		title = @"Download All";
-		color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
-	}  else if ([key isEqualToString:@"cello_deleteremove"]) {
-        title = @"Delete";
-        color = [UIColor redColor];
-    }
-    
-    
-    
-    id handler = ^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-        
-        if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
-            
-            [self performShowDetailViewControllerActionForIndexPath:indexPath];
-            
-        } else if ([key isEqualToString:@"cello_showinstore"]) {
-            
-            [self performShowInStoreActionForIndexPath:indexPath];
-            
-        } else if ([key isEqualToString:@"cello_startradiostation"]) {
-            
-            [self performStartStationActionForIndexPath:indexPath];
-            
-        } else if ([key isEqualToString:@"cello_playnext"]) {
-            
-            [self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
-            
-        } else if ([key isEqualToString:@"cello_addtoupnext"]) {
-            
-            [self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
-            
-        }  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
-            
-            [self performAddToPlaylistActionForIndexPath:indexPath];
-            
-        } else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
-            
-            [self performDownloadActionForIndexPath:indexPath];
-            
-		} else if ([key isEqualToString:@"cello_deleteremove"]) {
-            
-            UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
-            [self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
-            
-        }
-        
-        SW_PIRACY;
-        
-    };
-    
-    UITableViewRowAction *rowAction = [UITableViewRowAction
-                                       rowActionWithStyle:UITableViewRowActionStyleNormal
-                                       title:title
-                                       handler:handler];
-    rowAction.backgroundColor = color;
-    
-    return rowAction;
 }
 
 #pragma mark - Actions(Perform)

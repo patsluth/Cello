@@ -19,12 +19,7 @@
 }
 
 @property (nonatomic, readonly) SWCello_ActionType popActionType;
-
 @property (strong, nonatomic, readonly) NSArray *contextualActionsPeek;
-@property (strong, nonatomic, readonly) NSArray *contextualActionsSlide;
-//FUTURE
-//@property (strong, nonatomic, readonly) NSArray *contextualActionsSlideLeft;
-//@property (strong, nonatomic, readonly) NSArray *contextualActionsSlideRight;
 
 @end
 
