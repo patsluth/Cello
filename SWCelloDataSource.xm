@@ -93,6 +93,47 @@ handler:nil]; \
 
 
 
+
+
+
+// TODO: MOVE
+@interface MusicLibraryActionsCoordinator : NSObject
+{
+}
+
++ (id)sharedCoordinator;
+
+- (void)_postInvalidationNotification;
+- (void)addOperations:(id)arg1;
+- (id)libraryActionPendingValuesForIdentifierCollection:(id)arg1;
+
+@end
+
+@interface MusicLibraryActionKeepLocalOperation : NSOperation
+{
+}
+
+@property (readonly, copy) MPUContentItemIdentifierCollection *contentItemIdentifierCollection;
+@property (readonly) NSInteger keepLocalValue;
+
+- (id)contentItemIdentifierCollection;
+- (id)initWithContentItemIdentifierCollection:(id)arg1 keepLocalValue:(NSInteger)arg2;
+- (NSInteger)keepLocalValue;
+
+@end
+
+
+
+
+
+
+
+
+
+
+
+
+
 @implementation SWCelloDataSource
 
 #pragma mark - Init
@@ -273,22 +314,12 @@ handler:nil]; \
 	
 	
 	__block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-	MusicCoalescingEntityValueProvider *coalescingDescriptor;
-	coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+	id<MusicEntityValueProviding> valueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+	MusicCoalescingEntityValueProvider *coalescing = (MusicCoalescingEntityValueProvider *)valueProvider;
 	NSMutableArray *actions = [@[] mutableCopy];
 	
 	
-	if ([coalescingDescriptor.baseEntityValueProvider isKindOfClass:%c(MusicShuffleActionEntityValueProvider)]) {
-
-		if (actionClass == [UIPreviewAction class]) {
-			[actions addObject:[self uipreviewActionForKey:@"cello_makeallavailableoffline"
-													 title:@"Make All Available Offline"]];
-		} else if (actionClass == [UITableViewRowAction class]) {
-			[actions addObject:[self tableViewRowActionForKey:@"cello_makeallavailableoffline"
-														title:@"Download All"]];
-		}
-		
-	} else {
+	if (![coalescing.baseEntityValueProvider isKindOfClass:%c(MusicShuffleActionEntityValueProvider)]) {
 		
 		for (NSDictionary *action in enabledActionDataSource) {
 			
@@ -300,13 +331,15 @@ handler:nil]; \
 				
 				// Special scenario for make available offline action
 				if ([key isEqualToString:@"cello_makeavailableoffline"]){
-					if ([[coalescingDescriptor valueForEntityProperty:@"keepLocal"] boolValue]) {
+					
+					if (coalescing.isLocal) {
 						if ([valueContext cello_isConcreteMediaItem]) {
 							title = @"Remove Download";
 						} else {
 							title = @"Remove Downloads";
 						}
 					}
+					
 				}
 				
 				id previewAction;
@@ -327,7 +360,7 @@ handler:nil]; \
 		
 	}
 	
-	
+
     return [actions copy];
 }
 
@@ -366,10 +399,6 @@ handler:nil]; \
             
             [self performDownloadActionForIndexPath:indexPath];
             
-		} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
-			
-			[self performDownloadAllActionForIndexPath:indexPath];
-			
 		} else if ([key isEqualToString:@"cello_deleteremove"]) {
             
             UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
@@ -454,10 +483,6 @@ handler:nil]; \
             
             [self performDownloadActionForIndexPath:indexPath];
             
-		} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
-			
-			[self performDownloadAllActionForIndexPath:indexPath];
-			
 		} else if ([key isEqualToString:@"cello_deleteremove"]) {
             
             UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
@@ -573,109 +598,21 @@ handler:nil]; \
 - (void)performDownloadActionForIndexPath:(NSIndexPath *)indexPath
 {
 	MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    MusicContextualLibraryUpdateAlertAction *contextAction;
+	id<MusicEntityValueProviding> valueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
+	MusicCoalescingEntityValueProvider *coalescing = (MusicCoalescingEntityValueProvider *)valueProvider;
+	NSInteger keepLocalValue = (coalescing.isLocal) ? -1 : 1;
 	
-	@try {				// iOS <= 9.0.2
-		
-		[%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:nil
-																		 keepLocalAction:&contextAction
-																   forEntityValueContext:valueContext
-															  overrideItemEntityProvider:nil
-																	shouldDismissHandler:nil
-														   additionalPresentationHandler:nil
-																	   didDismissHandler:nil];
-		
-	} @catch (NSException *exception) {
-		
-		NSLog(@"%@", exception);
-		
-		@try {			// iOS > 9.0.3
-			
-			[%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddAction:nil
-																		  removeAction:nil
-																	   keepLocalAction:&contextAction
-																 forEntityValueContext:valueContext
-															overrideItemEntityProvider:nil
-																	 allowAssetRemoval:YES
-																  shouldDismissHandler:nil
-														 additionalPresentationHandler:nil
-																	 didDismissHandler:nil];
-			
-		} @catch (NSException *exception) {
-			NSLog(@"%@", exception);
-		}
-		
+	MPUContentItemIdentifierCollection *valueCollection = valueContext.itemIdentifierCollection;
+	if (!valueCollection) {
+		valueCollection = valueContext.containerIdentifierCollection;
 	}
 	
-	if (contextAction) {
-		[contextAction performContextualAction];
-	}
-}
-
-- (void)performDownloadAllActionForIndexPath:(NSIndexPath *)indexPath
-{
-	if ([self.delegate respondsToSelector:@selector(tableView)]) {
-		
-		UITableView *tableView = [self.delegate valueForKey:@"tableView"];
-		NSMutableArray *indexPaths = [NSMutableArray new];
-		
-		for (NSUInteger section = 0; section < tableView.numberOfSections; section += 1) {
-			for (NSUInteger row = 0; row < [tableView numberOfRowsInSection:section]; row += 1) {
-				
-				[indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:section]];
-				
-			}
-		}
-		
-		[self _performDownloadAllActionForIndexPathRecursive:@{ @"tableView" : tableView, @"indexPaths" : indexPaths }];
-		
-	}
-}
-
-/**
- *  Recusively download item's which are not downloaded with a delay
- *
- *  @param NSDictioary with keys @"tableView" = UITableView and @"indexPaths" = NSMutableArray<NSIndexPath *>
- */
-- (void)_performDownloadAllActionForIndexPathRecursive:(NSDictionary *)arg1
-{
-	UITableView *tableView = arg1[@"tableView"];
-	NSMutableArray<NSIndexPath *> *indexPaths = arg1[@"indexPaths"];
+	MusicLibraryActionKeepLocalOperation *operation;
+	operation = [[%c(MusicLibraryActionKeepLocalOperation) alloc]
+				 initWithContentItemIdentifierCollection:valueCollection
+				 keepLocalValue:keepLocalValue];
 	
-	if (tableView) {
-		
-		// we have items and user is not scrolling
-		if (indexPaths.count > 0 && tableView.panGestureRecognizer.state == UIGestureRecognizerStatePossible) {
-			
-			NSIndexPath *indexPath = [indexPaths firstObject];
-			[indexPaths removeObject:indexPath];
-			arg1 = @{ @"tableView" : tableView, @"indexPaths" : indexPaths };
-			
-			// Scroll to current index path so we can access it's data
-			[tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-			MusicCoalescingEntityValueProvider *coalescingDescriptor;
-			coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
-			
-			// This item is already downloaded
-			if (coalescingDescriptor && ![[coalescingDescriptor valueForEntityProperty:@"keepLocal"] boolValue]) {
-				
-				[self performDownloadActionForIndexPath:indexPath];
-				[self performSelector:_cmd withObject:arg1 afterDelay:1.0 inModes:@[NSRunLoopCommonModes]]; // Run while tableView is dragging
-				
-			} else {
-				
-				[self _performDownloadAllActionForIndexPathRecursive:arg1];
-				
-			}
-			
-		} else {
-			
-			[NSObject cancelPreviousPerformRequestsWithTarget:self];
-			
-		}
-		
-	}
-	
+	[[%c(MusicLibraryActionsCoordinator) sharedCoordinator] addOperations:@[operation]];
 }
 
 - (void)performRemoveFromPlaylistActionForIndexPath:(NSIndexPath *)indexPath
@@ -844,7 +781,6 @@ handler:nil]; \
 }
 
 @end
-
 
 
 

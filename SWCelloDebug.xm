@@ -587,3 +587,64 @@ didDismissBlock:(id /* block */)arg2
 
 
 
+
+%hook MusicLibraryActionKeepLocalOperation
+
+- (id)initWithContentItemIdentifierCollection:(id)arg1 keepLocalValue:(long long)arg2
+{
+	id orig = %orig(arg1, arg2);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"arg2:[%@]", @(arg2));
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
+
+%end
+
+
+
+
+
+%hook MusicLibraryActionsCoordinator
+
+//- (void)addOperations:(NSArray<MusicLibraryActionKeepLocalOperation *> *)arg1
+//{
+//	%orig(arg1);
+//	
+//	LOG_METHOD_START
+//	for (MusicLibraryActionKeepLocalOperation *item in arg1) {
+//		NSLog(@"arg1:[%@]", item);
+//		NSLog(@"%@", item.contentItemIdentifierCollection);
+//	}
+//	LOG_METHOD_END
+//}
+
+- (void)_postInvalidationNotification
+{
+	%orig();
+	
+	LOG_METHOD_START
+	LOG_METHOD_END
+}
+
+- (void)observeValueForKeyPath:(id)arg1 ofObject:(id)arg2 change:(id)arg3 context:(void *)arg4
+{
+	%orig(arg1, arg2, arg3, arg4);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"arg2:[%@]", arg2);
+	NSLog(@"arg3:[%@]", arg3);
+	NSLog(@"arg4:[%p]", arg4);
+	LOG_METHOD_END
+}
+
+%end
+
+
+
+

@@ -29,12 +29,36 @@
     return itemName;
 }
 
+%new
+- (BOOL)isLocal
+{
+	id isLocal = [self valueForEntityProperty:@"isLocal"];
+	id keepLocal = [self valueForEntityProperty:@"keepLocal"];
+	
+	if (isLocal != nil) {
+		if ([keepLocal integerValue] == 1) {
+			return YES;
+		} else {
+			return NO;
+		}
+	}
+	if (keepLocal != nil) {
+		if ([keepLocal integerValue] == 1) {
+			return YES;
+		} else {
+			return NO;
+		}
+	}
+	
+	return NO;
+}
+
 - (id)valueForEntityProperty:(NSString *)arg1
 {
     // hide contextual button
-//    if ([arg1 isEqualToString:@"musicWantsContextualActionsButton"]) {
-//        return @(NO);
-//    }
+    if ([arg1 isEqualToString:@"musicWantsContextualActionsButton"]) {
+        return @(NO);
+    }
 	
     return %orig(arg1);
 }
