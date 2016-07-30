@@ -520,7 +520,67 @@ completion:(/*^block*/id)arg6
 	return orig;
 }
 
+%end
 
+
+
+
+
+%hook MusicContextualLibraryUpdateAlertAction
+
+// iOS 9.3.3
++ (void)getContextualLibraryAddAction:(id *)arg1
+removeAction:(id *)arg2
+keepLocalAction:(id *)arg3
+forEntityValueContext:(id)arg4
+overrideItemEntityProvider:(id)arg5
+allowAssetRemoval:(bool)arg6
+shouldDismissHandler:(id /* block */)arg7
+additionalPresentationHandler:(id /* block */)arg8
+didDismissHandler:(id /* block */)arg9
+{
+	%orig(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+	
+	LOG_METHOD_START
+//	NSLog(@"arg1:[%@]", *arg1);
+//	NSLog(@"arg2:[%@]", *arg2);
+//	NSLog(@"arg3:[%@]", *arg3);
+	NSLog(@"arg4:[%@]", arg4);
+	NSLog(@"arg5:[%@]", arg5);
+	NSLog(@"arg6:[%@]", @(arg6));
+	NSLog(@"arg7:[%@]", arg7);
+	NSLog(@"arg8:[%@]", arg8);
+	NSLog(@"arg9:[%@]", arg9);
+	LOG_METHOD_END
+}
+
++ (id)newAddExplicitContentWarningAlertControllerWithContentItemType:(unsigned long long)arg1
+didDismissBlock:(id /* block */)arg2
+{
+	id orig = %orig(arg1, arg2);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", @(arg1));
+	NSLog(@"arg2:[%@]", arg2);
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
+
++ (id)notificationTokenForOverrideItemEntityProvider:(id)arg1 queue:(id)arg2 usingBlock:(id /* block */)arg3
+{
+	id orig = %orig(arg1, arg2, arg3);
+	
+	LOG_METHOD_START
+	NSLog(@"arg1:[%@]", arg1);
+	NSLog(@"arg2:[%@]", arg2);
+	NSLog(@"arg2:[%@]", arg3);
+	NSLog(@"retunVal:[%@]", orig);
+	LOG_METHOD_END
+	
+	return orig;
+}
 
 %end
 

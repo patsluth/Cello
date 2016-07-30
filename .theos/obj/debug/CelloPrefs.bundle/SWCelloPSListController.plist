@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>title</key>
+	<string>Cello</string>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>label</key>
+			<string>Pop Action</string>
+			<key>key</key>
+			<string>cello_popaction_type</string>
+			<key>validTitles</key>
+			<array>
+				<string>Show Detail View Controller</string>
+				<string>Show in iTunes Store</string>
+				<string>Start Radio Station</string>
+				<string>Play Next</string>
+				<string>Add to Up Next</string>
+				<string>Add to Playlist</string>
+				<string>Make Available Offline</string>
+				<string>Delete</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+			</array>
+			<key>defaults</key>
+			<string>com.patsluth.cello</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>SWCelloContextualActionsPSViewController</string>
+			<key>label</key>
+			<string>Peek Contextual Actions</string>
+			<key>key</key>
+			<string>cello_contextual_actions_peek</string>
+			<key>defaults</key>
+			<string>com.patsluth.cello</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>SWCelloContextualActionsPSViewController</string>
+			<key>label</key>
+			<string>Slide Contextual Actions</string>
+			<key>key</key>
+			<string>cello_contextual_actions_slide</string>
+			<key>defaults</key>
+			<string>com.patsluth.cello</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Reset All Settings</string>
+			<key>confirmation</key>
+			<dict>
+				<key>title</key>
+				<string>Reset All Settings</string>
+				<key>prompt</key>
+				<string>Are you sure you want to reset all settings?</string>
+				<key>okTitle</key>
+				<string>Yes</string>
+				<key>cancelTitle</key>
+				<string>No</string>
+			</dict>
+			<key>action</key>
+			<string>resetAllSettings:</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Created By</string>
+		</dict>
+		<dict>
+			<key>cellClass</key>
+			<string>SWPSTwitterCell</string>
+			<key>username</key>
+			<string>patsluth</string>
+			<key>secondaryText</key>
+			<string>Developer</string>
+			<key>imagePath</key>
+			<string>/Library/PreferenceBundles/CelloPrefs.bundle/Developer_Twitter_Profile.jpeg</string>
+			<key>action</key>
+			<string>viewTwitterProfile:</string>
+			<key>height</key>
+			<integer>80</integer>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>isStaticText</key>
+			<true/>
+			<key>label</key>
+			<string></string>
+			<key>footerText</key>
+			<string>© 2015 Pat Sluth - Sluthware</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>get</key>
+			<string>getVersionNumberForSpecifier:</string>
+			<key>label</key>
+			<string>Version</string>
+		</dict>
+	</array>
+</dict>
+</plist>

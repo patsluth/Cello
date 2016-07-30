@@ -9,7 +9,7 @@
 /* Begin PBXFileReference section */
 		2E0CB1661C34504E0059D1CF /* SWCelloTest.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloTest.xm; sourceTree = "<group>"; };
 		2E0CB1671C34639A0059D1CF /* MusicLibraryBrowseCollectionViewController.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryBrowseCollectionViewController.xm; sourceTree = "<group>"; };
-		2E6A6E2B1CCC7A310037CAD3 /* CelloTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = CelloTests.xctest; path = "/Users/patsluth/Development/jailbreak_workspace/Cello/build/Debug-iphoneos/CelloTests.xctest"; sourceTree = "<absolute>"; };
+		2E5483F21CD07E34000895E9 /* CelloTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = CelloTests.xctest; path = "/Users/patsluth/Development/jailbreak_workspace/Cello/build/Debug-iphoneos/CelloTests.xctest"; sourceTree = "<absolute>"; };
 		2E6EAA121C35726F0050B13A /* SWCelloDataSource.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = SWCelloDataSource.xm; sourceTree = "<group>"; };
 		2E6EAA131C358DBF0050B13A /* MusicLibrarySongsViewConfiguration.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibrarySongsViewConfiguration.xm; sourceTree = "<group>"; };
 		2E6EAA141C3598880050B13A /* MusicLibraryGenresViewConfiguration.xm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; path = MusicLibraryGenresViewConfiguration.xm; sourceTree = "<group>"; };
@@ -38,6 +38,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2E0DF7B81CCD2E7400AA346B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		2EBB756F1BE97BB900A3A82D = {
 			isa = PBXGroup;
 			children = (
@@ -58,6 +65,7 @@
 				2EC644381C319EB80014A675 /* SWCelloDebug.xm */,
 				2E6F41451C304DE900B9361F /* SWCelloPrefs.xm */,
 				2E0CB1661C34504E0059D1CF /* SWCelloTest.xm */,
+				2E0DF7B81CCD2E7400AA346B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,7 +86,7 @@
 			);
 			name = CelloTests;
 			productName = CelloTests;
-			productReference = 2E6A6E2B1CCC7A310037CAD3 /* CelloTests.xctest */;
+			productReference = 2E5483F21CD07E34000895E9 /* CelloTests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */

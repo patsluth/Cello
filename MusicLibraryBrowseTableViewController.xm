@@ -11,6 +11,7 @@
 
 #import "MusicEntityValueContext+SW.h"
 #import "MusicLibraryBrowseTableViewController+SW.h"
+#import "MusicCoalescingEntityValueProvider+SW.h"
 
 #import <FuseUI/MusicEntityContentDescriptorViewConfiguring.h>
 #import <FuseUI/MusicProfileAlbumsViewController.h>
@@ -19,7 +20,6 @@
 //TODO: Consilidate to SWCelloDataSource (UITABLEVIEW / UICOLLECTIONVIEW editing)
 #import "SWCello.h"
 #import "SWCelloPrefs.h"
-#import <FuseUI/MusicCoalescingEntityValueProvider.h>
 
 
 

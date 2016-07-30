@@ -10,9 +10,6 @@
 #import "SWCelloPrefs.h"
 #import "libsw/libSluthware/libSluthware.h"
 
-#import <FuseUI/MusicCoalescingEntityValueProvider.h>
-#import <FuseUI/MusicEntityViewContentTextDescriptor.h>
-
 #import <MediaPlayer/MPArtworkCatalog.h>
 #import <MediaPlayer/MPMutableArtworkColorAnalysis.h>
 
@@ -30,6 +27,8 @@
 
 #import "MusicEntityValueContext+SW.h"
 #import "MusicMediaDetailViewController+SW.h"
+#import "MusicCoalescingEntityValueProvider+SW.h"
+#import <FuseUI/MusicEntityViewContentTextDescriptor.h>
 
 #import <MediaPlayer/MediaPlayer.h>
 #import <MobileGestalt/MobileGestalt.h>
@@ -282,9 +281,11 @@ handler:nil]; \
 	if ([coalescingDescriptor.baseEntityValueProvider isKindOfClass:%c(MusicShuffleActionEntityValueProvider)]) {
 
 		if (actionClass == [UIPreviewAction class]) {
-			[actions addObject:[self uipreviewActionForKey:@"cello_makeallavailableoffline" title:@"Make All Available Offline"]];
+			[actions addObject:[self uipreviewActionForKey:@"cello_makeallavailableoffline"
+													 title:@"Make All Available Offline"]];
 		} else if (actionClass == [UITableViewRowAction class]) {
-			[actions addObject:[self tableViewRowActionForKey:@"cello_makeallavailableoffline" title:@"Download All"]];
+			[actions addObject:[self tableViewRowActionForKey:@"cello_makeallavailableoffline"
+														title:@"Download All"]];
 		}
 		
 	} else {
@@ -518,13 +519,37 @@ handler:nil]; \
 - (void)performUpNextAction:(SWCello_UpNextActionType)actionType forIndexPath:(NSIndexPath *)indexPath
 {
 	MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
+	MusicContextualUpNextAlertAction *contextAction;
 	
-    MusicContextualUpNextAlertAction *contextAction = [%c(MusicContextualUpNextAlertAction)
-                                                       contextualUpNextActionWithEntityValueContext:valueContext
-                                                       insertionType:actionType
-                                                       didDismissHandler:nil];
-    
-    [contextAction performContextualAction];
+	@try {				// iOS <= 9.0.2
+		
+		contextAction = [%c(MusicContextualUpNextAlertAction)
+						 contextualUpNextActionWithEntityValueContext:valueContext
+						 insertionType:actionType
+						 didDismissHandler:nil];
+		
+	} @catch (NSException *exception) {
+		
+		NSLog(@"%@", exception);
+		
+		@try {			// iOS > 9.0.3
+			
+			contextAction = [%c(MusicContextualUpNextAlertAction)
+							 contextualUpNextActionWithEntityValueContext:valueContext
+							 insertionType:actionType
+							 alertController:nil
+							 presentingViewController:self.delegate
+							 didDismissHandler:nil];
+			
+		} @catch (NSException *exception) {
+			NSLog(@"%@", exception);
+		}
+		
+	}
+	
+	if (contextAction) {
+		[contextAction performContextualAction];
+	}
 }
 
 - (void)performAddToPlaylistActionForIndexPath:(NSIndexPath *)indexPath
@@ -548,16 +573,43 @@ handler:nil]; \
 - (void)performDownloadActionForIndexPath:(NSIndexPath *)indexPath
 {
 	MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    
     MusicContextualLibraryUpdateAlertAction *contextAction;
-    [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:nil
-                                                                     keepLocalAction:&contextAction
-                                                               forEntityValueContext:valueContext
-                                                          overrideItemEntityProvider:nil
-                                                                shouldDismissHandler:nil
-                                                       additionalPresentationHandler:nil
-                                                                   didDismissHandler:nil];
-    [contextAction performContextualAction];
+	
+	@try {				// iOS <= 9.0.2
+		
+		[%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:nil
+																		 keepLocalAction:&contextAction
+																   forEntityValueContext:valueContext
+															  overrideItemEntityProvider:nil
+																	shouldDismissHandler:nil
+														   additionalPresentationHandler:nil
+																	   didDismissHandler:nil];
+		
+	} @catch (NSException *exception) {
+		
+		NSLog(@"%@", exception);
+		
+		@try {			// iOS > 9.0.3
+			
+			[%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddAction:nil
+																		  removeAction:nil
+																	   keepLocalAction:&contextAction
+																 forEntityValueContext:valueContext
+															overrideItemEntityProvider:nil
+																	 allowAssetRemoval:YES
+																  shouldDismissHandler:nil
+														 additionalPresentationHandler:nil
+																	 didDismissHandler:nil];
+			
+		} @catch (NSException *exception) {
+			NSLog(@"%@", exception);
+		}
+		
+	}
+	
+	if (contextAction) {
+		[contextAction performContextualAction];
+	}
 }
 
 - (void)performDownloadAllActionForIndexPath:(NSIndexPath *)indexPath
@@ -575,7 +627,7 @@ handler:nil]; \
 			}
 		}
 		
-		[self _performDownloadAllActionForIndexPathRecursive:@{ @"tableView" : tableView,  @"indexPaths" : indexPaths  }];
+		[self _performDownloadAllActionForIndexPathRecursive:@{ @"tableView" : tableView, @"indexPaths" : indexPaths }];
 		
 	}
 }
@@ -604,7 +656,8 @@ handler:nil]; \
 			MusicCoalescingEntityValueProvider *coalescingDescriptor;
 			coalescingDescriptor = (MusicCoalescingEntityValueProvider *)[self.delegate cello_entityValueProviderAtIndexPath:indexPath];
 			
-			if (coalescingDescriptor && ![[coalescingDescriptor valueForEntityProperty:@"keepLocal"] boolValue]) { // This item is already downloaded
+			// This item is already downloaded
+			if (coalescingDescriptor && ![[coalescingDescriptor valueForEntityProperty:@"keepLocal"] boolValue]) {
 				
 				[self performDownloadActionForIndexPath:indexPath];
 				[self performSelector:_cmd withObject:arg1 afterDelay:1.0 inModes:@[NSRunLoopCommonModes]]; // Run while tableView is dragging
@@ -638,16 +691,43 @@ handler:nil]; \
 
 - (void)performDeleteFromLibraryActionForValueContext:(MusicEntityValueContext *)valueContext
 {
-    MusicContextualLibraryUpdateAlertAction *contextAction;
-    [%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:&contextAction
-                                                                     keepLocalAction:nil
-                                                               forEntityValueContext:valueContext
-                                                          overrideItemEntityProvider:nil
-                                                                shouldDismissHandler:nil
-                                                       additionalPresentationHandler:nil
-                                                                   didDismissHandler:nil];
-    
-    [contextAction performContextualAction];
+	MusicContextualLibraryUpdateAlertAction *contextAction;
+	
+	@try {				// iOS <= 9.0.2
+		
+		[%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddRemoveAction:&contextAction
+																		 keepLocalAction:nil
+																   forEntityValueContext:valueContext
+															  overrideItemEntityProvider:nil
+																	shouldDismissHandler:nil
+														   additionalPresentationHandler:nil
+																	   didDismissHandler:nil];
+		
+	} @catch (NSException *exception) {
+		
+		NSLog(@"%@", exception);
+		
+		@try {			// iOS > 9.0.3
+			
+			[%c(MusicContextualLibraryUpdateAlertAction) getContextualLibraryAddAction:nil
+																		  removeAction:&contextAction
+																	   keepLocalAction:nil
+																 forEntityValueContext:valueContext
+															overrideItemEntityProvider:nil
+																	 allowAssetRemoval:NO
+																  shouldDismissHandler:nil
+														 additionalPresentationHandler:nil
+																	 didDismissHandler:nil];
+			
+		} @catch (NSException *exception) {
+			NSLog(@"%@", exception);
+		}
+		
+	}
+	
+	if (contextAction) {
+		[contextAction performContextualAction];
+	}
 }
 
 - (UIAlertController *)deleteConfirmationAlertControllerForIndexPath:(NSIndexPath *)indexPath
