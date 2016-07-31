@@ -31,8 +31,10 @@
      commitViewController:(UIViewController<SWCelloMediaEntityPreviewViewController> *)viewControllerToCommit;
 
 
-- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath;
+// Must be UIPreviewAction or UITableViewRowAction
+- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath actionClass:(Class)actionClass;
 - (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title;
+- (UITableViewRowAction *)tableViewRowActionForKey:(NSString *)key title:(NSString *)title;
 
 - (void)performShowDetailViewControllerActionForIndexPath:(NSIndexPath *)indexPath;
 - (void)performShowInStoreActionForIndexPath:(NSIndexPath *)indexPath;

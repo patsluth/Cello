@@ -54,6 +54,18 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>SWCelloContextualActionsPSViewController</string>
+			<key>label</key>
+			<string>Slide Contextual Actions</string>
+			<key>key</key>
+			<string>cello_contextual_actions_slide</string>
+			<key>defaults</key>
+			<string>com.patsluth.cello</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSGroupCell</string>
 		</dict>
 		<dict>

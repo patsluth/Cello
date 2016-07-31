@@ -24,6 +24,8 @@
 
 %hook MusicLibrarySearchResultsViewController
 
+#pragma mark - UIViewControllerPreviewing
+
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
 {
@@ -53,7 +55,13 @@
 
 %end
 
+
+
+
+
 %hook MusicLibraryBrowseHeterogenousCollectionViewController
+
+#pragma mark - UIViewControllerPreviewing
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -69,7 +77,13 @@
 
 %end
 
+
+
+
+
 %hook MusicLibraryBrowseCollectionViewController
+
+#pragma mark - Init
 
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -85,6 +99,8 @@
     
     %orig(animated);
 }
+
+#pragma mark - UIViewControllerPreviewing
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location

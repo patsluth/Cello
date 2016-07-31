@@ -200,7 +200,7 @@ handler:nil]; \
 	
 	
 	previewViewController.celloPreviewIndexPath = indexPath;
-	previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath];
+	previewViewController.celloPreviewActionItems = [self availableActionsForIndexPath:indexPath actionClass:[UIPreviewAction class]];
 	
 	
 	
@@ -259,9 +259,18 @@ handler:nil]; \
 
 #pragma mark - Actions(Instantiate)
 
-- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath
+- (NSArray *)availableActionsForIndexPath:(NSIndexPath *)indexPath actionClass:(Class)actionClass
 {
-	NSArray *enabledActionDataSource = self.celloPrefs.contextualActionsPeek;
+	NSArray *enabledActionDataSource; // The preference array for actionClass
+	
+	if (actionClass == [UIPreviewAction class]) {
+		enabledActionDataSource = self.celloPrefs.contextualActionsPeek;
+	} else if (actionClass == [UITableViewRowAction class]) {
+		enabledActionDataSource = self.celloPrefs.contextualActionsSlide;
+	} else {
+		return nil;
+	}
+	
 	
 	__block MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
 	id<MusicEntityValueProviding> valueProvider = [self.delegate cello_entityValueProviderAtIndexPath:indexPath];
@@ -292,7 +301,13 @@ handler:nil]; \
 					
 				}
 				
-				id previewAction = [self uipreviewActionForKey:key title:title];
+				id previewAction;
+				
+				if (actionClass == [UIPreviewAction class]) {
+					previewAction = [self uipreviewActionForKey:key title:title];
+				} else if (actionClass == [UITableViewRowAction class]) {
+					previewAction = [self tableViewRowActionForKey:key title:title];
+				}
 				
 				if (previewAction) {
 					[actions addObject:previewAction];
@@ -304,8 +319,7 @@ handler:nil]; \
 		
 	}
 	
-
-    return [actions copy];
+	return [actions copy];
 }
 
 - (UIPreviewAction *)uipreviewActionForKey:(NSString *)key title:(NSString *)title
@@ -362,16 +376,101 @@ handler:nil]; \
     return previewAction;
 }
 
+- (UITableViewRowAction *)tableViewRowActionForKey:(NSString *)key title:(NSString *)title
+{
+	UIColor *color;
+	//TEMPORARY
+	if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
+		title = @"Detail";
+		color = [UIColor purpleColor];
+	} else if ([key isEqualToString:@"cello_showinstore"]) {
+		title = @"Store";
+		color = [UIColor orangeColor];
+	} else if ([key isEqualToString:@"cello_startradiostation"]) {
+		title = @"Radio";
+		color = [UIColor greenColor];
+	} else if ([key isEqualToString:@"cello_playnext"]) {
+		title = @"Play\nNext";
+		color = [UIColor colorWithRed:0.1 green:0.71 blue:1.0 alpha:1.0];
+	} else if ([key isEqualToString:@"cello_addtoupnext"]) {
+		title = @"Queue";
+		color = [UIColor colorWithRed:0.97 green:0.58 blue:0.02 alpha:1.0];
+	}  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
+		title = @"+\nPlaylist";
+		color = [UIColor cyanColor];
+	} else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
+		title = @"Download";
+		color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
+	} else if ([key isEqualToString:@"cello_makeallavailableoffline"]) {
+		title = @"Download All";
+		color = [UIColor colorWithRed:0.56 green:0.27 blue:0.68 alpha:1.0];
+	}  else if ([key isEqualToString:@"cello_deleteremove"]) {
+		title = @"Delete";
+		color = [UIColor redColor];
+	}
+	
+	
+	
+	id handler = ^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+		
+		if ([key isEqualToString:@"cello_showdetailviewcontroller"]) {
+			
+			[self performShowDetailViewControllerActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_showinstore"]) {
+			
+			[self performShowInStoreActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_startradiostation"]) {
+			
+			[self performStartStationActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_playnext"]) {
+			
+			[self performUpNextAction:SWCello_UpNextActionType_PlayNext forIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_addtoupnext"]) {
+			
+			[self performUpNextAction:SWCello_UpNextActionType_AddToUpNext forIndexPath:indexPath];
+			
+		}  else if ([key isEqualToString:@"cello_addtoplaylist"]) {
+			
+			[self performAddToPlaylistActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_makeavailableoffline"]) {
+			
+			[self performDownloadActionForIndexPath:indexPath];
+			
+		} else if ([key isEqualToString:@"cello_deleteremove"]) {
+			
+			UIAlertController *deleteConfirmController = [self deleteConfirmationAlertControllerForIndexPath:indexPath];
+			[self.delegate presentViewController:deleteConfirmController animated:YES completion:nil];
+			
+		}
+		
+		SW_PIRACY;
+		
+	};
+	
+	UITableViewRowAction *rowAction = [UITableViewRowAction
+									   rowActionWithStyle:UITableViewRowActionStyleNormal
+									   title:title
+									   handler:handler];
+	rowAction.backgroundColor = color;
+	
+	return rowAction;
+}
+
 #pragma mark - Actions(Perform)
 
 - (void)performShowDetailViewControllerActionForIndexPath:(NSIndexPath *)indexPath
 {
     MusicEntityValueContext *valueContext = [self.delegate _entityValueContextAtIndexPath:indexPath];
-    
+	
     UIViewController *previewViewController = [self.delegate.libraryViewConfiguration
                                                previewViewControllerForEntityValueContext:valueContext
                                                fromViewController:self.delegate];
-    
+	
     if ([previewViewController isKindOfClass:%c(MusicContextualActionsHeaderViewController)]) { // Simulate tapping on the header
         [self.delegate.libraryViewConfiguration handleSelectionOfEntityValueContext:valueContext fromViewController:self.delegate];
     } else {

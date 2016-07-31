@@ -64,7 +64,13 @@
 
 %end
 
+
+
+
+
 %hook MusicLibraryBrowseTableViewController
+
+#pragma mark - Init
 
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -80,6 +86,8 @@
     
     %orig(animated);
 }
+
+#pragma mark - UIViewControllerPreviewing
 
 // peek
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
@@ -188,6 +196,60 @@
     }
     
     return valueContext;
+}
+
+#pragma mark - UITableView
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	// if all options are disabled then don't allow sliding
+	if (self.celloDataSource.celloPrefs.contextualActionsSlide.count > 0) {
+		return YES;
+	} else {
+		return %orig(tableView, indexPath);
+	}
+}
+
+//- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	// if all options are disabled then don't allow sliding
+	if (self.celloDataSource.celloPrefs.contextualActionsSlide.count > 0) {
+		
+		id<MusicEntityValueProviding> cell = [self cello_entityValueProviderAtIndexPath:indexPath];
+		
+		// MusicCoalescingEntityValueProvider contains cached media properties
+		if (cell && [cell isKindOfClass:%c(MusicCoalescingEntityValueProvider)]) {
+			
+			id baseEntityValueProvider = ((MusicCoalescingEntityValueProvider *)cell).baseEntityValueProvider;
+			
+			// media cell
+			if ([[baseEntityValueProvider class] isSubclassOfClass:%c(MPMediaEntity)]) {
+				
+				return UITableViewCellEditingStyleDelete;
+				
+			}
+		}
+		
+	}
+	
+	// not a media cell
+	return %orig(tableView, indexPath);
+}
+
+%new
+- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	NSArray *actions = [self.celloDataSource availableActionsForIndexPath:indexPath actionClass:[UITableViewRowAction class]];
+	
+	if (actions.count == 0) {
+		return nil;
+	}
+	
+	return actions;
 }
 
 #pragma mark - Cello Additions
